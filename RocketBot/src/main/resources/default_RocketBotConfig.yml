@@ -36,7 +36,6 @@ Default_Game: default
 # <               All bot configuration                >
 # +----------------------------------------------------+
 
-# Text channels where time-in and time-broadcast where be logged.
 TextChannel:
   - '123456789'
   - '987654321'
