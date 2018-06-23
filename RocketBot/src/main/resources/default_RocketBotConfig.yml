@@ -43,4 +43,4 @@ TextChannel:
 
 # This will be the logo of the plugin and will be seen when help command
 # is executed.
-Plugin_Logo: "http://thehosting.space/seasonsmc/NewSeasons.jpg"
+Plugin_Logo: ""
