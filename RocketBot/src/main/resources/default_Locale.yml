@@ -1,0 +1,13 @@
+session:
+  start: 'Sync session started! %s'
+  approved: 'Sync session approved! %s'
+  cancelled: 'Sync session cancelled! %s'
+  declined: 'Sync session denied! %s | Reason: %s'
+sync:
+  approved: '&rAccount sync &aapproved!'
+  cancelled: '&cAccount sync cancelled!'
+  denied: '&rAccount sync &cdenied!'
+exception:
+  illegalconfirmkey: 'Confirm key did not match MCBSync''s verification code key'
+  illegalconfirmrequester: 'Confirm requester did not match MCBSync''s verification code requester'
+  illegalconfirmsessionid: 'Confirm session id did not match MCBSync''s verification code session id'

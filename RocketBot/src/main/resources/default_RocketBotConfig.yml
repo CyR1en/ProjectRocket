@@ -1,0 +1,46 @@
+# +----------------------------------------------------+
+# <                 Bot Configuration                  >
+# <                                                    >
+# <               All bot configuration                >
+# +----------------------------------------------------+
+
+# Bot token can be found on your
+# Discord application page.
+Bot_Token: sample.token
+
+# Bot ID, this is also known as Client ID
+# on your Discord application page.
+Bot_ID: '123456789'
+
+# Owner ID of the owner of the bot, server, or guild.
+# You can easily get your id by right
+# clicking your self and copy id.
+# This only works when developer mode is enabled.
+# Go to settings>appearance and enable developer mode
+Owner_ID: '123456789'
+
+# Set of character that distinguish if it's a command.
+Command_Trigger: '!!'
+
+# Should bot's command responses be deleted after 5 minutes?
+Delete_Response: false
+
+# This will be the game of the bot
+# and will be shown under the name
+# of the bot as "Playing <Default_Game>"
+Default_Game: default
+
+# +----------------------------------------------------+
+# <               Plugin Configuration                 >
+# <                                                    >
+# <               All bot configuration                >
+# +----------------------------------------------------+
+
+# Text channels where time-in and time-broadcast where be logged.
+TextChannel:
+  - '123456789'
+  - '987654321'
+
+# This will be the logo of the plugin and will be seen when help command
+# is executed.
+Plugin_Logo: "http://thehosting.space/seasonsmc/NewSeasons.jpg"
