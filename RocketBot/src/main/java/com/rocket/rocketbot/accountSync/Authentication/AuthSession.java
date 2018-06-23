@@ -79,7 +79,7 @@ public class AuthSession {
             try {
                 throw new IllegalConfirmRequesterException();
             } catch (IllegalConfirmRequesterException illegalConfirmRequester) {
-                sender.chat("&6[MCBSync] &c" + illegalConfirmRequester.getMsg());
+                sender.chat("&6[RocketBot] &c" + illegalConfirmRequester.getMsg());
             }
         }
         status = authenticated ?  Status.APPROVED : Status.DENIED;
