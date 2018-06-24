@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class SimplifiedDatabase extends Database {
 
-    private static final Path filePath = Paths.get("plugins/MineCordBot/Users/Simplified-Accounts.json");
+    private static final Path filePath = Paths.get("plugins/RocketBot/Users/Simplified-Accounts.json");
     protected static JSONObject config;
 
     public static void set(String key, Object val) {
@@ -74,9 +74,10 @@ public class SimplifiedDatabase extends Database {
         try {
             JSONObject def = getDefault();
             if (!exists) {
-                Files.createDirectories(Paths.get("plugins/MineCordBot/Users"));
+                Files.createDirectories(Paths.get("plugins/RocketBot/Users"));
                 new File(String.valueOf(filePath)).createNewFile();
                 Files.write(filePath, def.toString(4).getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+                config = new JSONObject(new String(Files.readAllBytes(filePath), StandardCharsets.UTF_8));
             } else {
                 config = new JSONObject(new String(Files.readAllBytes(filePath), StandardCharsets.UTF_8));
                 for (String key : def.keySet()) {

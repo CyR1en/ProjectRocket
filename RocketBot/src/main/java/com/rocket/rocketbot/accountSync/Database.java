@@ -13,7 +13,7 @@ import java.nio.file.StandardOpenOption;
 
 public class Database {
 
-    private static final Path filePath = Paths.get("plugins/MineCordBot/Users/Accounts.json");
+    private static final Path filePath = Paths.get("plugins/RocketBot/Users/Accounts.json");
     private static JSONObject data;
 
     public static void set(String key, Object val) {
@@ -75,9 +75,10 @@ public class Database {
         try {
             JSONObject def = getDefault();
             if (!exists) {
-                Files.createDirectories(Paths.get("plugins/MineCordBot/Users"));
+                Files.createDirectories(Paths.get("plugins/RocketBot/Users"));
                 new File(String.valueOf(filePath)).createNewFile();
                 Files.write(filePath, def.toString(4).getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+                data = new JSONObject(new String(Files.readAllBytes(filePath), StandardCharsets.UTF_8));
             } else {
                 data = new JSONObject(new String(Files.readAllBytes(filePath), StandardCharsets.UTF_8));
                 for (String key : def.keySet()) {

@@ -44,19 +44,19 @@ public class Synchronize extends BCommand {
                     authSession.cancel();
                 }, AuthSession.SYNC_TIMEOUT, TimeUnit.MINUTES, authSession::cancel);
                 String msg = RocketBot.getLocale().getTranslatedMessage("sync.pending").finish();
-                ((ProxiedPlayer) commandSender).chat(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] " + msg));
+                commandSender.sendMessage((ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + msg)));
                 msg = RocketBot.getLocale().getTranslatedMessage("sync.sent").f(finalDUser1.getName() + "(" + finalDUser1.getId() + ")");
-                ((ProxiedPlayer) commandSender).chat(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + msg));
+                commandSender.sendMessage((ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + msg)));
             }, t -> {
-                ((ProxiedPlayer) commandSender).chat(ChatColor.translateAlternateColorCodes('&', cannotSendCode()));
+                commandSender.sendMessage((ChatColor.translateAlternateColorCodes('&', cannotSendCode())));
                 authSession.cancel();
             }), t -> {
-                ((ProxiedPlayer) commandSender).chat(ChatColor.translateAlternateColorCodes('&', cannotSendCode()));
+                commandSender.sendMessage((ChatColor.translateAlternateColorCodes('&', cannotSendCode())));
                 authSession.cancel();
             });
         } else {
             String msg = RocketBot.getLocale().getTranslatedMessage("sync.not-found").finish();
-            ((ProxiedPlayer) commandSender).chat(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + msg));
+            commandSender.sendMessage((ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + msg)));
         }
     }
 

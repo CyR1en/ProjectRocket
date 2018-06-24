@@ -2,6 +2,7 @@ package com.rocket.rocketbot;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.rocket.rocketbot.accountSync.Authentication.AuthManager;
+import com.rocket.rocketbot.accountSync.Database;
 import com.rocket.rocketbot.accountSync.listener.UserConnectionListener;
 import com.rocket.rocketbot.commands.minecraftCommands.SyncConfirm;
 import com.rocket.rocketbot.commands.minecraftCommands.Synchronize;
@@ -34,9 +35,11 @@ public class RocketBot extends Plugin {
         authManager = new AuthManager();
         locale = new Locale(this);
         instance = this;
+        Database.load();
 
         registerCommands();
         registerListener();
+        System.out.println(locale.getTranslatedMessage("session.declined").finish());
     }
 
     @Override
@@ -59,7 +62,7 @@ public class RocketBot extends Plugin {
             return new Locale(getInstance());
         return locale;
     }
-    
+
     public static RocketBot getInstance() {
         if(instance == null)
             return new RocketBot();

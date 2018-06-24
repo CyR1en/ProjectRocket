@@ -6,24 +6,27 @@ session:
   start: 'Sync session started! %s'
   approved: 'Sync session approved! %s'
   cancelled: 'Sync session cancelled! %s'
-  declined: 'Sync session denied! %s | Reason: %s'
+  declined: 'Sync session denied! %s'
 sync:
-  pending: '&rAccount sync &6pending!'
-  approved: '&rAccount sync &aapproved!'
-  cancelled: '&cAccount sync cancelled!'
-  denied: '&rAccount sync &cdenied!'
+  pending: 'Account sync pending!'
+  approved: 'Account sync approved!'
+  cancelled: 'Account sync cancelled!'
+  denied: 'Account sync denied!'
   cannot-send: 'Verification code cannot be sent because you are blocking Direct Messages. &aEnable Direct Messages and try again.'
   sent: 'A verification code have been sent to your Discord account %s'
   not-found: 'User not found'
-  message: '**Sync Verification Code**: \n
-           ``` %s ``` \n
-           Copy the verification code above and do __**/syncconfirm <verification code>**__ in-game. \n\n
-           _by syncing accounts, you agree that your account data(username, id) will be stored to the resource folder of MineCordBot. \n
+  message: '**Sync Verification Code**:
+           ```%s```
+          Copy the verification code above and do __**/syncconfirm <verification code>**__ in-game.
+
+
+           _by syncing accounts, you agree that your account data(username, id) will be stored to the resource folder of RocketBot.
+
            If you don''t give consent to store your data, press the cancel button bellow._'
 exception:
-  illegalconfirmkey: 'Confirm key did not match MCBSync''s verification code key'
-  illegalconfirmrequester: 'Confirm requester did not match MCBSync''s verification code requester'
-  illegalconfirmsessionid: 'Confirm session id did not match MCBSync''s verification code session id'
+  illegalconfirmkey: 'Confirm key did not match Authenticator verification code key'
+  illegalconfirmrequester: 'Confirm requester did not match Authenticator verification code requester'
+  illegalconfirmsessionid: 'Confirm session id did not match Authenticator verification code session id'
 dcommand:
   no-perm: 'Sorry you do not have access to this command.'
 mcommand:

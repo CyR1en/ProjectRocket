@@ -8,8 +8,8 @@ public class RocketClient extends JavaPlugin implements PluginMessageListener {
 
     @Override
     public void onEnable() {
-        getServer().getMessenger().registerOutgoingPluginChannel(this, "GlobalSystem");
-        getServer().getMessenger().registerIncomingPluginChannel(this, "GlobalSystem", this);
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
     }
 
     @Override

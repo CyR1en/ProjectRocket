@@ -12,7 +12,7 @@ import java.util.LinkedHashMap;
 public class UnifiedUser {
 
     @Getter private ProxiedPlayer proxiedPlayer;
-    @Getter  private DUser dUser;
+    @Getter private DUser dUser;
     private AccountDataFormat accountDataFormat;
 
     public UnifiedUser(ProxiedPlayer p) {

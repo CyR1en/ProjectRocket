@@ -7,9 +7,11 @@ import com.rocket.rocketbot.accountSync.exceptions.IllegalConfirmRequesterExcept
 import com.rocket.rocketbot.accountSync.exceptions.IllegalConfirmSessionIDException;
 import com.rocket.rocketbot.entity.DUser;
 import com.rocket.rocketbot.entity.UnifiedUser;
+import com.rocket.rocketbot.events.SynchronizeEvent;
 import lombok.Getter;
 import net.dv8tion.jda.core.entities.User;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
@@ -55,7 +57,7 @@ public class AuthSession {
             status = Status.CANCELLED;
             mcbSyncLog(SyncMessage.CANCELLED);
             String msg = RocketBot.getLocale().getTranslatedMessage("sync.cancelled").finish();
-            mcAcc.chat(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] " + msg));
+            mcAcc.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] " + msg));
         }
         scheduler.shutdownNow();
     }
@@ -66,35 +68,36 @@ public class AuthSession {
             try {
                 authenticated = authToken.authenticateToken(token);
             } catch (IllegalConfirmRequesterException illegalConfirmRequester) {
-                sender.chat(ChatColor.translateAlternateColorCodes('&',"&6[RocketBot] &c" + illegalConfirmRequester.getMsg()));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&6[RocketBot] &c" + illegalConfirmRequester.getMsg()));
                 mcbSyncLog(SyncMessage.DECLINED, illegalConfirmRequester.getClass().getSimpleName());
             } catch (IllegalConfirmKeyException illegalConfirmKey) {
-                sender.chat(ChatColor.translateAlternateColorCodes('&',"&6[RocketBot] &c" + illegalConfirmKey.getMsg()));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&6[RocketBot] &c" + illegalConfirmKey.getMsg()));
                 mcbSyncLog(SyncMessage.DECLINED, illegalConfirmKey.getClass().getSimpleName());
             } catch (IllegalConfirmSessionIDException illegalConfirmSessionID) {
-                sender.chat(ChatColor.translateAlternateColorCodes('&',"&6[RocketBot] &c" + illegalConfirmSessionID.getMsg()));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&6[RocketBot] &c" + illegalConfirmSessionID.getMsg()));
                 mcbSyncLog(SyncMessage.DECLINED, illegalConfirmSessionID.getClass().getSimpleName());
             }
         } else {
             try {
                 throw new IllegalConfirmRequesterException();
             } catch (IllegalConfirmRequesterException illegalConfirmRequester) {
-                sender.chat("&6[RocketBot] &c" + illegalConfirmRequester.getMsg());
+                sender.sendMessage("&6[RocketBot] &c" + illegalConfirmRequester.getMsg());
             }
         }
         status = authenticated ?  Status.APPROVED : Status.DENIED;
         if(status == Status.APPROVED) {
-            String msg = RocketBot.getLocale().getTranslatedMessage("sync.cancelled").finish();
-            getMcAcc().chat(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] " + msg));
+            String msg = RocketBot.getLocale().getTranslatedMessage("sync.approved").finish();
+            getMcAcc().sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &a" + msg));
             mcbSyncLog(SyncMessage.APPROVED);
             UnifiedUser mcUser = new UnifiedUser(sender);
             DUser mcbUser = new DUser(authManager.getSession(this.authToken.toString()).getDiscordAcc());
             mcUser.setMcbUser(mcbUser);
             Database.set(mcUser.getProxiedPlayer().getUniqueId().toString(), new JSONObject(mcUser.getDataAsMap()));
             authManager.removeSession(this.getSessionID());
+            ProxyServer.getInstance().getPluginManager().callEvent(new SynchronizeEvent(sender, mcUser));
         } else {
             String msg = RocketBot.getLocale().getTranslatedMessage("sync.cancelled").finish();
-            getMcAcc().chat(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] " + msg));
+            getMcAcc().sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &c" + msg));
             authManager.removeSession(this.getSessionID());
         }
     }
@@ -112,7 +115,7 @@ public class AuthSession {
                 syncLogger.info(formatSyncMessage(SyncMessage.APPROVED, getSessionID(), getMcAcc().getName(), getDiscordAcc().getName()));
                 break;
             case DECLINED:
-                syncLogger.info(formatSyncMessage(SyncMessage.DECLINED, getSessionID(), getMcAcc().getName(), getDiscordAcc().getName(), args));
+                syncLogger.info(formatSyncMessage(SyncMessage.DECLINED, getSessionID(), getMcAcc().getName(), getDiscordAcc().getName()));
                 break;
         }
     }

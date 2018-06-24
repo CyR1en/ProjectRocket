@@ -7,7 +7,6 @@ import com.rocket.rocketbot.RocketBot;
 import com.rocket.rocketbot.commands.DCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,13 +27,10 @@ public class HelpCmd extends DCommand {
         eb.setColor(e.getGuild().getMember(jda.getSelfUser()).getColor());
         eb.setDescription("For more detailed help, do " + getRocketBot().getBot().getClient().getPrefix() + "<command> help.");
         if (e.getArgs().isEmpty()) {
-            eb.setAuthor("SeasonsTime Commands", null, getRocketBot().getConfig().getPluginLogo());
-            User user = jda.getUserById("193970511615623168");
-            eb = listCommands(eb);
-            if (user != null) {
-                eb.setFooter("For more help, contact " + user.getName() + "#" + user.getDiscriminator(), user.getAvatarUrl());
-                respond(e, eb.build());
-            }
+            eb.setAuthor("RocketBot Commands", null, getRocketBot().getConfig().getPluginLogo());
+            eb.setFooter("RocketBot", null);
+            respond(e, eb.build());
+
         }
     }
 
