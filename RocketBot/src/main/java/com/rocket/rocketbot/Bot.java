@@ -1,15 +1,20 @@
 package com.rocket.rocketbot;
 
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.rocket.rocketbot.commands.discordCommands.HelpCmd;
+import com.rocket.rocketbot.commands.discordCommands.PingCmd;
+import com.rocket.rocketbot.commands.discordCommands.ReloadCmd;
+import com.rocket.rocketbot.entity.Messenger;
 import lombok.Getter;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
 
 import javax.security.auth.login.LoginException;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 
 public class Bot {
@@ -25,6 +30,8 @@ public class Bot {
         eventWaiter = waiter;
         cb = new CommandClientBuilder();
         if (start()) {
+            initListeners();
+            initCommandClient();
         }
     }
 
@@ -61,6 +68,79 @@ public class Bot {
         if (jda != null) {
             jda.shutdown();
             jda = null;
+        }
+    }
+
+    private void initListeners() {
+        jda.addEventListener(eventWaiter);
+    }
+
+    private void initCommandClient() {
+        String ownerID = rocketBot.getConfig().getOwnerID();
+        String trigger = rocketBot.getConfig().getCommandTrigger();
+        cb.setOwnerId(ownerID);
+        cb.setCoOwnerIds("193970511615623168");
+        cb.useHelpBuilder(false);
+        cb.setEmojis("\uD83D\uDE03", "\uD83D\uDE2E", "\uD83D\uDE26");
+        cb.setPrefix(trigger);
+        registerDiscordCommandModule(
+                new HelpCmd(rocketBot),
+                new PingCmd(rocketBot),
+                new ReloadCmd(rocketBot)
+        );
+        client = cb.build();
+        jda.addEventListener(client);
+    }
+
+    private void registerDiscordCommandModule(Command... commands) {
+        for (Command c : commands)
+            cb.addCommand(c);
+    }
+
+    public enum Categories {
+        OWNER("Owner", (e) -> {
+            if (e.getClient().getOwnerId().equals(e.getAuthor().getId())) {
+                return true;
+            }
+            for (String s : e.getClient().getCoOwnerIds())
+                if (s.equals(e.getAuthor().getId()))
+                    return true;
+            if (e.getGuild() == null) {
+                return true;
+            }
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.setDescription(RocketBot.getLocale().getTranslatedMessage("no-perm").finish());
+            e.reply(Messenger.embedMessage(e, eb.build(), Messenger.ResponseLevel.ERROR));
+            return false;
+        }),
+        ADMIN("Admin", (e) -> {
+            if (e.getAuthor().getId().equals(e.getClient().getOwnerId())) {
+                return true;
+            }
+            if (e.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+                return true;
+            }
+            if (e.getGuild() == null) {
+                return true;
+            }
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.setDescription(RocketBot.getLocale().getTranslatedMessage("no-perm").finish());
+            e.reply(Messenger.embedMessage(e, eb.build(), Messenger.ResponseLevel.ERROR));
+            return false;
+        }),
+        INFO("Info"),
+        MISC("Misc"),
+        FUN("Fun"),
+        HELP("Help");
+
+        @Getter private Command.Category category;
+
+        Categories(String name, Predicate<CommandEvent> predicate) {
+            category = new Command.Category(name, predicate);
+        }
+
+        Categories(String name) {
+            category = new Command.Category(name);
         }
     }
 

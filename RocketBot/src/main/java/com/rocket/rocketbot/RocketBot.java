@@ -2,7 +2,11 @@ package com.rocket.rocketbot;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.rocket.rocketbot.accountSync.Authentication.AuthManager;
+import com.rocket.rocketbot.accountSync.listener.UserConnectionListener;
+import com.rocket.rocketbot.commands.minecraftCommands.SyncConfirm;
+import com.rocket.rocketbot.commands.minecraftCommands.Synchronize;
 import com.rocket.rocketbot.configuration.SConfig;
+import com.rocket.rocketbot.listeners.SynchronizeListener;
 import com.rocket.rocketbot.localization.Locale;
 import lombok.Getter;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -27,13 +31,27 @@ public class RocketBot extends Plugin {
         eventWaiter = new EventWaiter();
         bot = new Bot(this, eventWaiter);
         scheduler = Executors.newSingleThreadScheduledExecutor();
-        instance = this;
+        authManager = new AuthManager();
         locale = new Locale(this);
+        instance = this;
+
+        registerCommands();
+        registerListener();
     }
 
     @Override
     public void onDisable() {
         bot.shutdown();
+    }
+
+    private void registerCommands() {
+        getProxy().getPluginManager().registerCommand(this, new Synchronize(this));
+        getProxy().getPluginManager().registerCommand(this, new SyncConfirm(this));
+    }
+
+    private void registerListener() {
+        getProxy().getPluginManager().registerListener(this, new SynchronizeListener(this));
+        getProxy().getPluginManager().registerListener(this, new UserConnectionListener(this));
     }
 
     public static Locale getLocale() {

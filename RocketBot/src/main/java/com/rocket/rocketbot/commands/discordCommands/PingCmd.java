@@ -2,6 +2,7 @@ package com.rocket.rocketbot.commands.discordCommands;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.rocket.rocketbot.Bot;
 import com.rocket.rocketbot.RocketBot;
 import com.rocket.rocketbot.commands.DCommand;
 
@@ -17,7 +18,7 @@ public class PingCmd extends DCommand {
         this.name = "ping";
         this.aliases = new String[]{"pong, p"};
         this.help = "Check bot's connectivity";
-        //this.category = Bot.MISC;
+        this.category = Bot.Categories.MISC.getCategory();
         waiter = getRocketBot().getEventWaiter();
     }
 

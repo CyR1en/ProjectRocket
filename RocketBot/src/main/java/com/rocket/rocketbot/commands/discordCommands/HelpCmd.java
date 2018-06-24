@@ -2,6 +2,7 @@ package com.rocket.rocketbot.commands.discordCommands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.rocket.rocketbot.Bot;
 import com.rocket.rocketbot.RocketBot;
 import com.rocket.rocketbot.commands.DCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -38,16 +39,16 @@ public class HelpCmd extends DCommand {
     }
 
     private EmbedBuilder listCommands(EmbedBuilder ebi) {
-        Command.Category[] categories = {Bot.MISC, Bot.HELP, Bot.INFO};
+        Bot.Categories[] categories = Bot.Categories.values();
         for (int i = 0; i <= categories.length - 1; i++) {
             StringBuilder str = new StringBuilder();
-            if (getAllCommandsWithCategoryOf(categories[i]).size() != 0) {
-                for (Command c : getAllCommandsWithCategoryOf(categories[i])) {
-                    str.append(getSt().getBot().getClient().getPrefix()).append(c.getName())
+            if (getAllCommandsWithCategoryOf(categories[i].getCategory()).size() != 0) {
+                for (Command c : getAllCommandsWithCategoryOf(categories[i].getCategory())) {
+                    str.append(getRocketBot().getBot().getClient().getPrefix()).append(c.getName())
                             .append(c.getArguments() == null ? "" : " " + c.getArguments())
                             .append(" - ").append(c.getHelp()).append("\n");
                 }
-                ebi.addField(" - " + categories[i].getName(), str.toString(), false);
+                ebi.addField(" - " + categories[i].getCategory().getName(), str.toString(), false);
             }
         }
         return ebi;
@@ -55,7 +56,7 @@ public class HelpCmd extends DCommand {
 
     private java.util.List<DCommand> getAllCommandsWithCategoryOf(Command.Category category) {
         ArrayList<DCommand> commands = new ArrayList<>();
-        for (Command c : getSt().getBot().getClient().getCommands()) {
+        for (Command c : getRocketBot().getBot().getClient().getCommands()) {
             if (c.getCategory().equals(category))
                 commands.add((DCommand) c);
         }

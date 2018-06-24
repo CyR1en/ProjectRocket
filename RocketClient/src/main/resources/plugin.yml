@@ -1,0 +1,4 @@
+name: RocketClient
+main: com.rocket.com.rocket.rocketclient.RocketClient
+version: 1.0
+author: CyR1en

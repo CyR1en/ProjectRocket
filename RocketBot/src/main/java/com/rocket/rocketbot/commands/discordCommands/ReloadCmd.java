@@ -2,6 +2,7 @@ package com.rocket.rocketbot.commands.discordCommands;
 
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.rocket.rocketbot.Bot;
 import com.rocket.rocketbot.RocketBot;
 import com.rocket.rocketbot.commands.DCommand;
 
@@ -11,7 +12,7 @@ public class ReloadCmd extends DCommand {
         super(rocketBot);
         this.name = "reload";
         this.help = "Reloads SeasonsTime's configuration.";
-        //this.category = Bot.MISC;
+        this.category = Bot.Categories.MISC.getCategory();
         this.type = Type.EMBED;
     }
 

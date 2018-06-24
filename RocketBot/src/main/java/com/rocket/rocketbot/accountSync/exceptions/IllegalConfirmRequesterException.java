@@ -9,7 +9,6 @@ public class IllegalConfirmRequesterException extends Exception{
         msg = RocketBot.getLocale().getTranslatedMessage("exception.illegalconfirmrequester").finish();
     }
 
-
     public IllegalConfirmRequesterException(String msg) {
         this.msg = msg;
     }
