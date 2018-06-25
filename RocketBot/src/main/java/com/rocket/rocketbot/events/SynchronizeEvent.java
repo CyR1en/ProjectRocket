@@ -14,4 +14,5 @@ public class SynchronizeEvent extends Event {
         this.proxiedPlayer = proxiedPlayer;
         this.unifiedUser = unifiedUser;
     }
+
 }

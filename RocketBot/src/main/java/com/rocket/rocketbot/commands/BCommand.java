@@ -75,5 +75,6 @@ public abstract class BCommand extends Command {
         doCommand(commandSender, args);
     }
 
+
     protected abstract void doCommand(CommandSender commandSender, String[] args);
 }

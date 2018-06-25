@@ -39,7 +39,7 @@ public class RocketBot extends Plugin {
 
         registerCommands();
         registerListener();
-        System.out.println(locale.getTranslatedMessage("session.declined").finish());
+        registerChannel();
     }
 
     @Override
@@ -55,6 +55,10 @@ public class RocketBot extends Plugin {
     private void registerListener() {
         getProxy().getPluginManager().registerListener(this, new SynchronizeListener(this));
         getProxy().getPluginManager().registerListener(this, new UserConnectionListener(this));
+    }
+
+    private void registerChannel() {
+        getProxy().registerChannel("Return");
     }
 
     public static Locale getLocale() {
