@@ -13,14 +13,14 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 public class SyncConfirm extends BCommand {
 
     public SyncConfirm(RocketBot rocketBot) {
-        super(rocketBot, "syncconfirm", "rocket.synchronize", "sc");
+        super(rocketBot, "syncconfirm", "rocket.synchronize", "sc", "codigo", "verify");
         this.isPlayerOnly = true;
         this.arg = "<confirm code>";
     }
 
     @Override
     protected void doCommand(CommandSender commandSender, String[] args) {
-        AuthToken authToken = null;
+        AuthToken authToken;
         try {
             authToken = new AuthToken((ProxiedPlayer) commandSender, args[0]);
             AuthManager authManager = RocketBot.getInstance().getAuthManager();

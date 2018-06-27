@@ -11,14 +11,15 @@ public class ReloadCmd extends DCommand {
     public ReloadCmd(RocketBot rocketBot) {
         super(rocketBot);
         this.name = "reload";
-        this.help = "Reloads SeasonsTime's configuration.";
+        this.help = "Reloads RocketBot configuration.";
         this.category = Bot.Categories.MISC.getCategory();
         this.type = Type.EMBED;
     }
 
     @Override
     protected void doCommand(CommandEvent e) {
-        getRocketBot().getConfig().reload();
-        respond(ResponseLevel.LEVEL_1, e, "Configuration have been reloaded successfully!");
+        rocketBot.reload();
+        String msg = RocketBot.getLocale().getTranslatedMessage("dcommand.reload").finish();
+        respond(ResponseLevel.LEVEL_1, e, msg);
     }
 }

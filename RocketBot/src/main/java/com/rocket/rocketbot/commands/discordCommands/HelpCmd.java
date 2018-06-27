@@ -8,8 +8,8 @@ import com.rocket.rocketbot.commands.DCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class HelpCmd extends DCommand {
 
@@ -17,7 +17,7 @@ public class HelpCmd extends DCommand {
         super(rocketBot);
         this.name = "help";
         this.help = "List all commands and show usage for a command.";
-        //this.category = Bot.HELP;
+        this.category = Bot.Categories.HELP.getCategory();
     }
 
     @Override
@@ -28,36 +28,31 @@ public class HelpCmd extends DCommand {
         eb.setDescription("For more detailed help, do " + getRocketBot().getBot().getClient().getPrefix() + "<command> help.");
         if (e.getArgs().isEmpty()) {
             eb.setAuthor("RocketBot Commands", null, getRocketBot().getConfig().getPluginLogo());
+            eb = listCommands(eb);
             eb.setFooter("RocketBot", null);
             respond(e, eb.build());
-
         }
     }
 
     private EmbedBuilder listCommands(EmbedBuilder ebi) {
-        Bot.Categories[] categories = Bot.Categories.values();
-        for (int i = 0; i <= categories.length - 1; i++) {
+        Bot.Categories.valuesAsList().forEach(c -> {
             StringBuilder str = new StringBuilder();
-            if (getAllCommandsWithCategoryOf(categories[i].getCategory()).size() != 0) {
-                for (Command c : getAllCommandsWithCategoryOf(categories[i].getCategory())) {
-                    str.append(getRocketBot().getBot().getClient().getPrefix()).append(c.getName())
-                            .append(c.getArguments() == null ? "" : " " + c.getArguments())
-                            .append(" - ").append(c.getHelp()).append("\n");
+            if (getAllCommandsWithCategoryOf(c.getCategory()).size() != 0) {
+                for (Command cmd : getAllCommandsWithCategoryOf(c.getCategory())) {
+                    str.append(getRocketBot().getBot().getClient().getPrefix()).append(cmd.getName())
+                            .append(cmd.getArguments() == null ? "" : " " + cmd.getArguments())
+                            .append(" - ").append(cmd.getHelp()).append("\n");
                 }
-                ebi.addField(" - " + categories[i].getCategory().getName(), str.toString(), false);
+                ebi.addField(" - " + c.getCategory().getName(), str.toString(), false);
             }
-        }
+        });
         return ebi;
     }
 
-    private java.util.List<DCommand> getAllCommandsWithCategoryOf(Command.Category category) {
-        ArrayList<DCommand> commands = new ArrayList<>();
-        for (Command c : getRocketBot().getBot().getClient().getCommands()) {
-            if (c.getCategory().equals(category))
-                commands.add((DCommand) c);
-        }
-        Collections.sort(commands);
-        return commands;
+    private List<Command> getAllCommandsWithCategoryOf(Command.Category category) {
+        List<Command> registered = getRocketBot().getBot().getClient().getCommands();
+        return registered.stream().filter(c -> c.getCategory().equals(category))
+                .sorted().collect(Collectors.toList());
     }
 
 }

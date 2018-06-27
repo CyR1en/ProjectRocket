@@ -18,7 +18,7 @@ public class RocketClient extends JavaPlugin implements Initializable {
 
     @Override
     public void onEnable() {
-        Initializer.initMethods(this);
+        Initializer.initAll(this);
     }
 
     @Override
@@ -26,18 +26,19 @@ public class RocketClient extends JavaPlugin implements Initializable {
         super.onDisable();
     }
 
-    @Initialize(priority = 1)
-    public void initPLC() {
-        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-        getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new PluginChannelListener(this));
-        Logger.info("- Now listening for Plugin Messages from BungeeCord");
-    }
 
     @Initialize(priority = 0)
     public void initConfig() {
         ConfigManager configManager = new ConfigManager(this);
         rConfigManager = new RConfigManager(configManager);
         Logger.info("- Loaded Configuration");
+    }
+
+    @Initialize(priority = 1)
+    public void initPLC() {
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new PluginChannelListener(this));
+        Logger.info("- Now listening for Plugin Messages from BungeeCord");
     }
 
     public RocketClient getInstance() {

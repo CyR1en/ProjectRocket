@@ -5,6 +5,7 @@ import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.rocket.rocketbot.commands.discordCommands.DeSyncCmd;
 import com.rocket.rocketbot.commands.discordCommands.HelpCmd;
 import com.rocket.rocketbot.commands.discordCommands.PingCmd;
 import com.rocket.rocketbot.commands.discordCommands.ReloadCmd;
@@ -14,6 +15,8 @@ import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
 
 import javax.security.auth.login.LoginException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 
@@ -86,7 +89,8 @@ public class Bot {
         registerDiscordCommandModule(
                 new HelpCmd(rocketBot),
                 new PingCmd(rocketBot),
-                new ReloadCmd(rocketBot)
+                new ReloadCmd(rocketBot),
+                new DeSyncCmd(rocketBot)
         );
         client = cb.build();
         jda.addEventListener(client);
@@ -141,6 +145,10 @@ public class Bot {
 
         Categories(String name) {
             category = new Command.Category(name);
+        }
+
+        public static List<Categories> valuesAsList() {
+            return Arrays.asList(Categories.values());
         }
     }
 

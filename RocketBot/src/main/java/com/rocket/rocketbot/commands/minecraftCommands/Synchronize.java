@@ -21,7 +21,7 @@ public class Synchronize extends BCommand {
     private static final String CANCEL = "\u274c";
 
     public Synchronize(RocketBot rocketBot) {
-        super(rocketBot, "/synchronize", "rocket.synchronize", "sync");
+        super(rocketBot, "/synchronize", "rocket.synchronize", "sync", "discord", "link");
         this.isPlayerOnly = true;
         this.arg = "<Discord Username or Discord ID>";
     }
@@ -33,6 +33,12 @@ public class Synchronize extends BCommand {
         if (dUser == null)
             dUser = (FinderUtils.findMember(args[0]) == null) ? null : FinderUtils.findMember(args[0]).getUser();
         if (dUser != null) {
+            if(FinderUtils.findPlayerInDatabase(dUser.getId()) != null) {
+                ProxiedPlayer pp = FinderUtils.findPlayerInDatabase(dUser.getId());
+                String message = RocketBot.getLocale().getTranslatedMessage("sync.synchronized").f(args[0], pp.getName());
+                commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + message));
+                return;
+            }
             AuthSession authSession = new AuthSession((ProxiedPlayer) commandSender, dUser);
             AuthToken token = authSession.getAuthToken();
             User finalDUser1 = dUser;

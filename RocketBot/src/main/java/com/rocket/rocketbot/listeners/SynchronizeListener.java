@@ -22,23 +22,29 @@ public class SynchronizeListener extends SListener {
     }
 
     @EventHandler
-    public void handleSynchronize(SynchronizeEvent event) {
+    public void sendGroupQuery(SynchronizeEvent event) {
         ServerInfo server = event.getProxiedPlayer().getServer().getInfo();
         sendToBukkit("GQuery", event.getProxiedPlayer().getUniqueId().toString(), server);
+        getRocketBot().getLogger().info(String.format("[%s] Ping-1!", this.getClass().getSimpleName()));
         evt = event;
     }
 
     @EventHandler
-    public void getGroupQuery(PluginMessageEvent event) {
+    public void readQueryResponse(PluginMessageEvent event) {
         if (event.getTag().equalsIgnoreCase("BungeeCord")) {
             DataInputStream in = new DataInputStream(new ByteArrayInputStream(event.getData()));
             try {
                 String channel = in.readUTF();
-                if(channel.equals("RQuery")){
+                if (channel.equals("RQuery")) {
                     ServerInfo server = evt.getProxiedPlayer().getServer().getInfo();
-                    String group = in.readUTF();
-                    handleRole(group);
+                    String content = in.readUTF();
+                    if (!content.equals("null"))
+                        handleRole(content);
                     sendToBukkit("command", "", server);
+                    getRocketBot().getLogger().info(String.format("[%s] Ping-2!", this.getClass().getSimpleName()));
+                    String message = RocketBot.getLocale().getTranslatedMessage("sync.broadcast")
+                            .f(evt.getProxiedPlayer().getName());
+                    getRocketBot().getBroadcaster().sendBroadcastToAll(message, true);
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -48,11 +54,11 @@ public class SynchronizeListener extends SListener {
 
     private void handleRole(String group) {
         ProxiedPlayer pp = evt.getProxiedPlayer();
-        if(group != null) {
+        if (group != null) {
             getRocketBot().getBot().getJda().getGuilds().forEach(g -> {
                 Member m = g.getMemberById(evt.getUnifiedUser().getDUser().getUser().getId());
                 GuildController controller = g.getController();
-                if(roleExists(g, group))
+                if (roleExists(g, group))
                     g.getRolesByName(group, true).forEach(r -> controller.addSingleRoleToMember(m, r).queue());
                 else
                     controller.createRole().setName(group).queue(r -> controller.addSingleRoleToMember(m, r).queue());
@@ -63,7 +69,7 @@ public class SynchronizeListener extends SListener {
 
     private boolean roleExists(Guild g, String role) {
         for (Role r : g.getRoles())
-            if(r.getName().equalsIgnoreCase(role))
+            if (r.getName().equalsIgnoreCase(role))
                 return true;
         return false;
     }
@@ -77,7 +83,7 @@ public class SynchronizeListener extends SListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
         server.sendData("Return", stream.toByteArray());
     }
 }

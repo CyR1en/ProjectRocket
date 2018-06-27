@@ -2,6 +2,8 @@ responselevel:
   lvl1: 'Success'
   lvl2: 'Warning'
   lvl3: 'Error'
+  information: 'Information'
+  broadcast: 'Broadcast'
 session:
   start: 'Sync session started! %s'
   approved: 'Sync session approved! %s'
@@ -15,6 +17,8 @@ sync:
   cannot-send: 'Verification code cannot be sent because you are blocking Direct Messages. &aEnable Direct Messages and try again.'
   sent: 'A verification code have been sent to your Discord account %s'
   not-found: 'User not found'
+  broadcast: '%s has synchronized their account and received a reward'
+  synchronized: 'The user %s is already synchronized to %!'
   message: '**Sync Verification Code**:
            ```%s```
           Copy the verification code above and do __**/syncconfirm <verification code>**__ in-game.
@@ -29,6 +33,7 @@ exception:
   illegalconfirmsessionid: 'Confirm session id did not match Authenticator verification code session id'
 dcommand:
   no-perm: 'Sorry you do not have access to this command.'
+  reloaded: 'Configuration have been reloaded successfully!'
 mcommand:
   player-only: 'Only players can use this command.'
   invalid-args: 'Invalid arguments. command arguments for %s: %s'

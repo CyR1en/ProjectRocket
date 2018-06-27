@@ -7,6 +7,7 @@ import com.rocket.rocketbot.accountSync.listener.UserConnectionListener;
 import com.rocket.rocketbot.commands.minecraftCommands.SyncConfirm;
 import com.rocket.rocketbot.commands.minecraftCommands.Synchronize;
 import com.rocket.rocketbot.configuration.SConfig;
+import com.rocket.rocketbot.entity.Broadcaster;
 import com.rocket.rocketbot.listeners.SynchronizeListener;
 import com.rocket.rocketbot.localization.Locale;
 import lombok.Getter;
@@ -25,16 +26,18 @@ public class RocketBot extends Plugin {
     @Getter private AuthManager authManager;
     @Getter private SConfig config;
     @Getter ScheduledExecutorService scheduler;
+    @Getter Broadcaster broadcaster;
 
     @Override
     public void onEnable() {
         config = new SConfig(this);
+        locale = new Locale(this);
         eventWaiter = new EventWaiter();
         bot = new Bot(this, eventWaiter);
         scheduler = Executors.newSingleThreadScheduledExecutor();
         authManager = new AuthManager();
-        locale = new Locale(this);
         instance = this;
+        broadcaster = new Broadcaster(this);
         Database.load();
 
         registerCommands();
@@ -59,6 +62,11 @@ public class RocketBot extends Plugin {
 
     private void registerChannel() {
         getProxy().registerChannel("Return");
+    }
+
+    public void reload() {
+        getConfig().reload();
+        broadcaster.loadChannels();
     }
 
     public static Locale getLocale() {

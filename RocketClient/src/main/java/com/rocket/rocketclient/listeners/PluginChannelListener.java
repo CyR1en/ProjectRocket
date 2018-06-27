@@ -1,5 +1,6 @@
 package com.rocket.rocketclient.listeners;
 
+import com.cyr1en.mcutils.logger.Logger;
 import com.rocket.rocketclient.RocketClient;
 import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.User;
@@ -27,6 +28,7 @@ public class PluginChannelListener implements PluginMessageListener {
             if (sub.equals("command")) {
                 String command = rocketClient.getRConfigManager().getGeneralConfig().getCommand();
                 Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+                Logger.info(String.format("[%s] Pong-2!", this.getClass().getSimpleName()));
             }
             if(sub.equals("GQuery")) {
                 RegisteredServiceProvider<LuckPermsApi> provider = Bukkit.getServicesManager().getRegistration(LuckPermsApi.class);
@@ -36,6 +38,9 @@ public class PluginChannelListener implements PluginMessageListener {
                     User user = api.getUser(UUID.fromString(sUUID));
                     if(user != null)
                         sendToBungeeCord(player, "RQuery", user.getPrimaryGroup());
+                    else
+                        sendToBungeeCord(player, "RQuery", "null");
+                    Logger.info(String.format("[%s] Pong-1!", this.getClass().getSimpleName()));
                 }
             }
         } catch (Exception ex) {
