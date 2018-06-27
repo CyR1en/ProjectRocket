@@ -30,7 +30,7 @@ public class HelpCmd extends DCommand {
             eb.setAuthor("RocketBot Commands", null, getRocketBot().getConfig().getPluginLogo());
             eb = listCommands(eb);
             eb.setFooter("RocketBot", null);
-            respond(e, eb.build());
+            e.reply(eb.build(), autoDeleteConsumer(e));
         }
     }
 

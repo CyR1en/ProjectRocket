@@ -18,7 +18,7 @@ sync:
   sent: 'A verification code have been sent to your Discord account %s'
   not-found: 'User not found'
   broadcast: '%s has synchronized their account and received a reward'
-  synchronized: 'The user %s is already synchronized to %!'
+  synchronized: 'The user %s is already synchronized to %s!'
   message: '**Sync Verification Code**:
            ```%s```
           Copy the verification code above and do __**/syncconfirm <verification code>**__ in-game.
@@ -33,7 +33,11 @@ exception:
   illegalconfirmsessionid: 'Confirm session id did not match Authenticator verification code session id'
 dcommand:
   no-perm: 'Sorry you do not have access to this command.'
-  reloaded: 'Configuration have been reloaded successfully!'
+  reloaded: 'Configuration had been reloaded successfully!'
+  dsync: 'Successfully desynchronized %s'
+  dsync-c1: 'Could not find user %s'
+  dsync-c2: '%s is not synchronized'
+  dsync-fail: 'An error occurred while desynchronizing.'
 mcommand:
   player-only: 'Only players can use this command.'
   invalid-args: 'Invalid arguments. command arguments for %s: %s'

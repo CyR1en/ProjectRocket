@@ -26,10 +26,8 @@ public class PingCmd extends DCommand {
     protected void doCommand(CommandEvent e) {
         e.getTextChannel().sendMessage("ping...").queue(msg -> msg.editMessage("ping: `" + e.getMessage().getCreationTime()
                 .until(msg.getCreationTime(), ChronoUnit.MILLIS) + " ms`").queue((m) -> {
-            scheduler.schedule(() -> {
-                if (auto)
-                    m.delete().queue();
-            }, RESPONSE_DURATION, TimeUnit.MINUTES);
+            if (auto)
+                scheduler.schedule(() -> m.delete().queue(), RESPONSE_DURATION, TimeUnit.MINUTES);
         }));
     }
 }

@@ -22,9 +22,11 @@ public class PluginChannelListener implements PluginMessageListener {
 
     @Override
     public void onPluginMessageReceived(String s, Player player, byte[] bytes) {
+        Logger.info("Received Plugin Message");
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes));
         try {
             String sub = in.readUTF();
+            Logger.info("sub = " + sub);
             if (sub.equals("command")) {
                 String command = rocketClient.getRConfigManager().getGeneralConfig().getCommand();
                 Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);

@@ -1,21 +1,23 @@
 package com.rocket.rocketbot.listeners;
 
+import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import com.rocket.rocketbot.RocketBot;
+import com.rocket.rocketbot.entity.UnifiedUser;
 import com.rocket.rocketbot.events.SynchronizeEvent;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.managers.GuildController;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.*;
+import java.util.List;
 
 public class SynchronizeListener extends SListener {
-
-    private SynchronizeEvent evt;
 
     public SynchronizeListener(RocketBot rocketBot) {
         super(rocketBot);
@@ -26,24 +28,26 @@ public class SynchronizeListener extends SListener {
         ServerInfo server = event.getProxiedPlayer().getServer().getInfo();
         sendToBukkit("GQuery", event.getProxiedPlayer().getUniqueId().toString(), server);
         getRocketBot().getLogger().info(String.format("[%s] Ping-1!", this.getClass().getSimpleName()));
-        evt = event;
     }
 
     @EventHandler
     public void readQueryResponse(PluginMessageEvent event) {
+        getRocketBot().getLogger().info("Event Tag: " + event.getTag());
         if (event.getTag().equalsIgnoreCase("BungeeCord")) {
             DataInputStream in = new DataInputStream(new ByteArrayInputStream(event.getData()));
             try {
                 String channel = in.readUTF();
                 if (channel.equals("RQuery")) {
-                    ServerInfo server = evt.getProxiedPlayer().getServer().getInfo();
+                    System.out.println(event.getSender().toString());
+                    ProxiedPlayer pp = ProxyServer.getInstance().getPlayer(event.getReceiver().toString());
                     String content = in.readUTF();
+                    ServerInfo server = pp.getServer().getInfo();
                     if (!content.equals("null"))
-                        handleRole(content);
+                        handleRole(content, pp);
                     sendToBukkit("command", "", server);
                     getRocketBot().getLogger().info(String.format("[%s] Ping-2!", this.getClass().getSimpleName()));
                     String message = RocketBot.getLocale().getTranslatedMessage("sync.broadcast")
-                            .f(evt.getProxiedPlayer().getName());
+                            .f(pp.getName());
                     getRocketBot().getBroadcaster().sendBroadcastToAll(message, true);
                 }
             } catch (IOException e1) {
@@ -52,26 +56,26 @@ public class SynchronizeListener extends SListener {
         }
     }
 
-    private void handleRole(String group) {
-        ProxiedPlayer pp = evt.getProxiedPlayer();
-        if (group != null) {
-            getRocketBot().getBot().getJda().getGuilds().forEach(g -> {
-                Member m = g.getMemberById(evt.getUnifiedUser().getDUser().getUser().getId());
-                GuildController controller = g.getController();
-                if (roleExists(g, group))
-                    g.getRolesByName(group, true).forEach(r -> controller.addSingleRoleToMember(m, r).queue());
-                else
-                    controller.createRole().setName(group).queue(r -> controller.addSingleRoleToMember(m, r).queue());
-                controller.setNickname(m, pp.getName()).queue();
-            });
+    private void handleRole(String group, ProxiedPlayer p) {
+        if (group == null)
+            return;
+        List<Guild> guilds = getRocketBot().getBot().getJda().getGuilds();
+        for (Guild g : guilds) {
+            UnifiedUser unifiedUser = new UnifiedUser(p);
+            Member m = g.getMemberById(unifiedUser.getDUser().getUser().getId());
+            GuildController controller = g.getController();
+            if (roleExists(g, group))
+                g.getRolesByName(group, true).forEach(r -> controller.addSingleRoleToMember(m, r).queue());
+            else
+                controller.createRole().setName(group).queue(r -> controller.addSingleRoleToMember(m, r).queue());
+            controller.setNickname(m, p.getName()).queue();
         }
     }
 
+
     private boolean roleExists(Guild g, String role) {
-        for (Role r : g.getRoles())
-            if (r.getName().equalsIgnoreCase(role))
-                return true;
-        return false;
+        List<Role> roles = FinderUtil.findRoles(role, g);
+        return roles.size() > 0;
     }
 
     private void sendToBukkit(String channel, String message, ServerInfo server) {
@@ -83,7 +87,6 @@ public class SynchronizeListener extends SListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         server.sendData("Return", stream.toByteArray());
     }
 }
