@@ -1,9 +1,12 @@
 package com.rocket.rocketbot.entity;
 
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import com.rocket.rocketbot.RocketBot;
+import lombok.Getter;
 import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.awt.*;
@@ -14,7 +17,7 @@ import java.util.List;
 public class Broadcaster {
 
     private RocketBot rocketBot;
-    private List<TextChannel> registeredChannels;
+    @Getter private List<TextChannel> registeredChannels;
 
     public Broadcaster(RocketBot rocketBot) {
         this.rocketBot = rocketBot;
@@ -49,8 +52,9 @@ public class Broadcaster {
 
     public void loadChannels() {
         List<String> sChannels = rocketBot.getConfig().getTextChannels();
-        List<Guild> guilds = rocketBot.getBot().getJda().getGuilds();
-        sChannels.forEach(s -> guilds.forEach(g ->
-                registeredChannels.addAll(FinderUtil.findTextChannels(s, g))));
+        rocketBot.findValidTextChannels(sChannels).forEach(tc -> {
+            registeredChannels.add(tc);
+            rocketBot.getLogger().info(String.format(" - registered %s", tc.toString()));
+        });
     }
 }

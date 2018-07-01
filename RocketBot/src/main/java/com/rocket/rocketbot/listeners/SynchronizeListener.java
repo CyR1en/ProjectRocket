@@ -2,12 +2,13 @@ package com.rocket.rocketbot.listeners;
 
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import com.rocket.rocketbot.RocketBot;
-import com.rocket.rocketbot.entity.UnifiedUser;
+import com.rocket.rocketbot.accountSync.SimplifiedDatabase;
 import com.rocket.rocketbot.events.SynchronizeEvent;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.managers.GuildController;
+import net.dv8tion.jda.core.utils.PermissionUtil;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -61,17 +62,23 @@ public class SynchronizeListener extends SListener {
             return;
         List<Guild> guilds = getRocketBot().getBot().getJda().getGuilds();
         for (Guild g : guilds) {
-            UnifiedUser unifiedUser = new UnifiedUser(p);
-            Member m = g.getMemberById(unifiedUser.getDUser().getUser().getId());
+            String id = SimplifiedDatabase.get(p.getUniqueId().toString());
+            Member m = g.getMemberById(id);
+            if(m == null)
+                continue;
             GuildController controller = g.getController();
-            if (roleExists(g, group))
-                g.getRolesByName(group, true).forEach(r -> controller.addSingleRoleToMember(m, r).queue());
-            else
-                controller.createRole().setName(group).queue(r -> controller.addSingleRoleToMember(m, r).queue());
-            controller.setNickname(m, p.getName()).queue();
+            if(PermissionUtil.canInteract(g.getMember(g.getJDA().getSelfUser()), m)) {
+                if (roleExists(g, group))
+                    g.getRolesByName(group, true).forEach(r -> controller.addSingleRoleToMember(m, r).queue());
+                else
+                    controller.createRole().setName(group).queue(r -> controller.addSingleRoleToMember(m, r).queue());
+                controller.setNickname(m, p.getName()).queue();
+            } else {
+                String message = String.format("The bot cannot modify the role or nickname for %s because %s has a higher or equal highest!", m.getEffectiveName());
+                getRocketBot().getLogger().warning(message);
+            }
         }
     }
-
 
     private boolean roleExists(Guild g, String role) {
         List<Role> roles = FinderUtil.findRoles(role, g);

@@ -21,7 +21,7 @@ public class Locale extends SFile {
         return new Formatter(translated);
     }
 
-    public static class Formatter {
+    public class Formatter {
         private String message;
 
         private Formatter(String message) {

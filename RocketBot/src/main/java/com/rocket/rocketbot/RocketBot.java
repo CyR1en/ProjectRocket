@@ -11,8 +11,13 @@ import com.rocket.rocketbot.entity.Broadcaster;
 import com.rocket.rocketbot.listeners.SynchronizeListener;
 import com.rocket.rocketbot.localization.Locale;
 import lombok.Getter;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.md_5.bungee.api.plugin.Plugin;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -38,6 +43,7 @@ public class RocketBot extends Plugin {
         authManager = new AuthManager();
         instance = this;
         broadcaster = new Broadcaster(this);
+        broadcaster.loadChannels();
         Database.load();
 
         registerCommands();
@@ -67,6 +73,27 @@ public class RocketBot extends Plugin {
     public void reload() {
         getConfig().reload();
         broadcaster.loadChannels();
+    }
+
+    public List<TextChannel> findValidTextChannels(List<String> tcID) {
+        List<TextChannel> out = new ArrayList<>();
+        tcID.forEach((s) -> {
+            if (!s.isEmpty() && bot.getJda() != null) {
+                if(StringUtils.isNumeric(s)) {
+                    TextChannel tc = bot.getJda().getTextChannelById(s);
+                    if (tc != null)
+                        out.add(tc);
+                } else {
+                    List<Guild> guilds = bot.getJda().getGuilds();
+                    guilds.forEach(g -> g.getTextChannels().forEach(tc -> {
+                        if(tc.getName().equals(s))
+                            out.add(tc);
+                    }));
+                }
+            }
+        });
+        getLogger().info(out.toString());
+        return out;
     }
 
     public static Locale getLocale() {

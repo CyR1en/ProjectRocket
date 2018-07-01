@@ -16,7 +16,7 @@ public class HelpCmd extends DCommand {
     public HelpCmd(RocketBot rocketBot) {
         super(rocketBot);
         this.name = "help";
-        this.help = "List all commands and show usage for a command.";
+        this.help = RocketBot.getLocale().getTranslatedMessage("dcommand.help-d").finish();
         this.category = Bot.Categories.HELP.getCategory();
     }
 
@@ -25,9 +25,10 @@ public class HelpCmd extends DCommand {
         EmbedBuilder eb = new EmbedBuilder();
         JDA jda = getRocketBot().getBot().getJda();
         eb.setColor(e.getGuild().getMember(jda.getSelfUser()).getColor());
-        eb.setDescription("For more detailed help, do " + getRocketBot().getBot().getClient().getPrefix() + "<command> help.");
+        eb.setDescription(RocketBot.getLocale().getTranslatedMessage("dcommand.help-md").finish());
         if (e.getArgs().isEmpty()) {
-            eb.setAuthor("RocketBot Commands", null, getRocketBot().getConfig().getPluginLogo());
+            eb.setAuthor(RocketBot.getLocale().getTranslatedMessage("dcommand.help-ta").finish(),
+                    null, getRocketBot().getConfig().getPluginLogo());
             eb = listCommands(eb);
             eb.setFooter("RocketBot", null);
             e.reply(eb.build(), autoDeleteConsumer(e));

@@ -33,11 +33,24 @@ exception:
   illegalconfirmsessionid: 'Confirm session id did not match Authenticator verification code session id'
 dcommand:
   no-perm: 'Sorry you do not have access to this command.'
-  reloaded: 'Configuration had been reloaded successfully!'
-  dsync: 'Successfully desynchronized %s'
+  reload-d: 'Reloads RocketBot configuration.'
+  reload-c1: 'Configuration had been reloaded successfully!'
+  dsync-d: 'Desynchronize an account'
+  dsync-a: '<Discord user name or ID>'
   dsync-c1: 'Could not find user %s'
   dsync-c2: '%s is not synchronized'
+  dsync-c3: 'Successfully desynchronized %s'
   dsync-fail: 'An error occurred while desynchronizing.'
+  help-d: 'List all commands and show usage for a command.'
+  help-md: 'For more detailed help, do %s<command> help.'
+  help-ta: 'RocketBot Commands'
+  ping-d: 'heck bot''s connectivity'
 mcommand:
   player-only: 'Only players can use this command.'
   invalid-args: 'Invalid arguments. command arguments for %s: %s'
+discord:
+  welcome-w: 'Bem Vindo %s!
+
+              Autentique sua conta com nosso servidor e receba sua tag automaticamente no Discord!'
+  welcome-fh: 'Use the command below in-game!'
+  welcome-fc: '/synchronize <discord username or id>'

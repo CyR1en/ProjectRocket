@@ -10,6 +10,7 @@ import com.rocket.rocketbot.commands.discordCommands.HelpCmd;
 import com.rocket.rocketbot.commands.discordCommands.PingCmd;
 import com.rocket.rocketbot.commands.discordCommands.ReloadCmd;
 import com.rocket.rocketbot.entity.Messenger;
+import com.rocket.rocketbot.listeners.DUserJoin;
 import lombok.Getter;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
@@ -76,6 +77,7 @@ public class Bot {
 
     private void initListeners() {
         jda.addEventListener(eventWaiter);
+        jda.addEventListener(new DUserJoin(rocketBot));
     }
 
     private void initCommandClient() {
@@ -121,6 +123,9 @@ public class Bot {
             if (e.getAuthor().getId().equals(e.getClient().getOwnerId())) {
                 return true;
             }
+            for (String s : e.getClient().getCoOwnerIds())
+                if (s.equals(e.getAuthor().getId()))
+                    return true;
             if (e.getMember().hasPermission(Permission.ADMINISTRATOR)) {
                 return true;
             }

@@ -17,8 +17,8 @@ public class DeSyncCmd extends DCommand {
     public DeSyncCmd(RocketBot rocketBot) {
         super(rocketBot);
         this.name = "desynchronize";
-        this.help = "Desynchronize an account";
-        this.arguments = "<Discord user name or ID>";
+        this.help = RocketBot.getLocale().getTranslatedMessage("dcommand.dsync-d").finish();
+        this.arguments = RocketBot.getLocale().getTranslatedMessage("dcommand.dsync-a").finish();
         this.aliases = new String[]{"desync"};
         this.category = Bot.Categories.ADMIN.getCategory();
         this.type = Type.EMBED;
@@ -44,7 +44,7 @@ public class DeSyncCmd extends DCommand {
             Database.getJSONObject(pp.getUniqueId().toString()).remove(DataKey.DISCORD_USERNAME.toString());
             Database.getJSONObject(pp.getUniqueId().toString()).put(DataKey.DISCORD_USERNAME.toString(), "Not Synced Yet");
             SimplifiedDatabase.set(pp.getUniqueId().toString(), "Not Synced Yet");
-            String msg = RocketBot.getLocale().getTranslatedMessage("dcommand.dsync").f(member.getEffectiveName());
+            String msg = RocketBot.getLocale().getTranslatedMessage("dcommand.dsync-c3").f(member.getEffectiveName());
             e.reply(Messenger.embedMessage(e, msg, Messenger.ResponseLevel.SUCCESS));
         } catch (Exception ex) {
             String msg = RocketBot.getLocale().getTranslatedMessage("dcommand.dsync-fail").finish();

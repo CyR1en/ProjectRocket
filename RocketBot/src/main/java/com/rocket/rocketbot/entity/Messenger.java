@@ -15,13 +15,20 @@ import java.time.OffsetDateTime;
 public class Messenger {
 
     public static MessageEmbed embedMessage(CommandEvent event, MessageEmbed message, ResponseLevel level) {
+        return embedMessage(event, message, level, event.getMessage().getCreationTime(), level.getColor());
+    }
+
+    public static MessageEmbed embedMessage(CommandEvent event, MessageEmbed message, ResponseLevel level, OffsetDateTime odt, Color color) {
+        return embedMessage(event.getJDA().getSelfUser(), message, level, odt, color);
+    }
+
+    public static MessageEmbed embedMessage(User bot, MessageEmbed message, ResponseLevel level, OffsetDateTime odt, Color color) {
         EmbedBuilder embedBuilder = new EmbedBuilder(message);
-        User bot = event.getJDA().getSelfUser();
         embedBuilder.setAuthor(bot.getName() + " #" + bot.getDiscriminator(),
                 null, bot.getEffectiveAvatarUrl());
         embedBuilder.setFooter(level.getFooter(), null);
-        embedBuilder.setTimestamp(event.getMessage().getCreationTime());
-        embedBuilder.setColor(level.getColor());
+        embedBuilder.setTimestamp(odt);
+        embedBuilder.setColor(color);
         return embedBuilder.build();
     }
 

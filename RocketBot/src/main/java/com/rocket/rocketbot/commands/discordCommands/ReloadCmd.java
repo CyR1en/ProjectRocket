@@ -14,7 +14,7 @@ public class ReloadCmd extends DCommand {
     public ReloadCmd(RocketBot rocketBot) {
         super(rocketBot);
         this.name = "reload";
-        this.help = "Reloads RocketBot configuration.";
+        this.help = RocketBot.getLocale().getTranslatedMessage("dcommand.reload-d").finish();
         this.category = Bot.Categories.MISC.getCategory();
         this.type = Type.EMBED;
     }
@@ -22,7 +22,7 @@ public class ReloadCmd extends DCommand {
     @Override
     protected void doCommand(CommandEvent e) {
         rocketBot.reload();
-        String msg = RocketBot.getLocale().getTranslatedMessage("dcommand.reloaded").finish();
+        String msg = RocketBot.getLocale().getTranslatedMessage("dcommand.reload-c1").finish();
         e.reply(Messenger.embedMessage(e.getJDA(), msg, Messenger.ResponseLevel.INFO, OffsetDateTime.now(), e.getGuild().getSelfMember().getColor()), autoDeleteConsumer(e));
     }
 }
