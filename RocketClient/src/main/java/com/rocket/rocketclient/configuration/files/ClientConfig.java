@@ -24,7 +24,7 @@ public class ClientConfig extends BaseConfig {
     }
 
     enum CNode implements Node {
-        COMMAND("Command", new String[]{"command to be dispatched", "when a player syncs their", "accounts"}, "/<some command>\"");
+        COMMAND("Command", new String[]{"command to be dispatched", "when a player syncs their", "accounts"}, "say cheese!");
 
         private String key;
         private String[] comment;

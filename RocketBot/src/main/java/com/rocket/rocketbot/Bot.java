@@ -4,16 +4,28 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.rocket.rocketbot.accountSync.DataKey;
+import com.rocket.rocketbot.accountSync.Database;
+import com.rocket.rocketbot.accountSync.SimplifiedDatabase;
 import com.rocket.rocketbot.commands.discordCommands.DeSyncCmd;
 import com.rocket.rocketbot.commands.discordCommands.HelpCmd;
 import com.rocket.rocketbot.commands.discordCommands.PingCmd;
 import com.rocket.rocketbot.commands.discordCommands.ReloadCmd;
 import com.rocket.rocketbot.entity.Messenger;
+import com.rocket.rocketbot.listeners.BotReady;
 import com.rocket.rocketbot.listeners.DUserJoin;
 import lombok.Getter;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.managers.GuildController;
+import net.dv8tion.jda.core.utils.PermissionUtil;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.json.JSONObject;
 
 import javax.security.auth.login.LoginException;
 import java.util.Arrays;
@@ -78,6 +90,7 @@ public class Bot {
     private void initListeners() {
         jda.addEventListener(eventWaiter);
         jda.addEventListener(new DUserJoin(rocketBot));
+        jda.addEventListener(new BotReady(rocketBot));
     }
 
     private void initCommandClient() {
@@ -101,6 +114,64 @@ public class Bot {
     private void registerDiscordCommandModule(Command... commands) {
         for (Command c : commands)
             cb.addCommand(c);
+    }
+
+    public void removeRole(String role, ProxiedPlayer pp) {
+        List<Guild> guilds = getJda().getGuilds();
+        for (Guild guild : guilds) {
+            String id = SimplifiedDatabase.get(pp.getUniqueId().toString());
+            Member m = guild.getMemberById(id);
+            GuildController gc = guild.getController();
+            Member gMember = guild.getMemberById(m.getUser().getId());
+            if(gMember != null) {
+                guild.getRolesByName(role, true).forEach(r -> {
+                    if(gMember.getRoles().contains(r))
+                        gc.removeRolesFromMember(gMember, r).queue();
+                });
+            }
+        }
+    }
+
+    public void handleRole(String group, ProxiedPlayer p) {
+        if (group == null)
+            return;
+        List<Guild> guilds = getJda().getGuilds();
+        for (Guild g : guilds) {
+            String id = SimplifiedDatabase.get(p.getUniqueId().toString());
+            Member m = g.getMemberById(id);
+            if (m == null)
+                continue;
+            GuildController controller = g.getController();
+            if (PermissionUtil.canInteract(g.getMember(g.getJDA().getSelfUser()), m)) {
+                if (roleExists(g, group))
+                    g.getRolesByName(group, true).forEach(r -> {
+                        controller.addSingleRoleToMember(m, r).queue();
+                        setDB(p, r);
+                    });
+                else {
+                    controller.createRole().setName(group).setHoisted(true).queue(r -> {
+                        controller.addSingleRoleToMember(m, r).queue();
+                        setDB(p, r);
+                    });
+                }
+                controller.setNickname(m, p.getName()).queue();
+            } else {
+                String message = String.format("The bot cannot modify the role or nickname for %s because %s has a higher or equal highest!", m.getEffectiveName(), m.getEffectiveName());
+                rocketBot.getLogger().warning(message);
+            }
+        }
+    }
+
+    private void setDB(ProxiedPlayer p, Role r) {
+        JSONObject data = Database.getJSONObject(p.getUniqueId().toString());
+        data.remove(DataKey.MC_GROUP.toString());
+        data.put(DataKey.MC_GROUP.toString(), r.getName());
+        Database.set(p.getUniqueId().toString(), data);
+    }
+
+    private boolean roleExists(Guild g, String role) {
+        List<Role> roles = FinderUtil.findRoles(role, g);
+        return roles.size() > 0;
     }
 
     public enum Categories {

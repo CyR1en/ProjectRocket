@@ -13,9 +13,13 @@ import com.rocket.rocketbot.localization.Locale;
 import lombok.Getter;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -43,7 +47,6 @@ public class RocketBot extends Plugin {
         authManager = new AuthManager();
         instance = this;
         broadcaster = new Broadcaster(this);
-        broadcaster.loadChannels();
         Database.load();
 
         registerCommands();
@@ -92,7 +95,6 @@ public class RocketBot extends Plugin {
                 }
             }
         });
-        getLogger().info(out.toString());
         return out;
     }
 
@@ -106,5 +108,17 @@ public class RocketBot extends Plugin {
         if(instance == null)
             return new RocketBot();
         return instance;
+    }
+
+    public void sendToBukkit(String channel, String message, ServerInfo server) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(stream);
+        try {
+            out.writeUTF(channel);
+            out.writeUTF(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        server.sendData("Return", stream.toByteArray());
     }
 }

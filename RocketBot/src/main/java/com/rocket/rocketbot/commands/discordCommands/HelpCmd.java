@@ -27,8 +27,10 @@ public class HelpCmd extends DCommand {
         eb.setColor(e.getGuild().getMember(jda.getSelfUser()).getColor());
         eb.setDescription(RocketBot.getLocale().getTranslatedMessage("dcommand.help-md").finish());
         if (e.getArgs().isEmpty()) {
+            String plLogo = getRocketBot().getConfig().getPluginLogo();
+            plLogo = plLogo.isEmpty() ? jda.getSelfUser().getAvatarUrl() : plLogo;
             eb.setAuthor(RocketBot.getLocale().getTranslatedMessage("dcommand.help-ta").finish(),
-                    null, getRocketBot().getConfig().getPluginLogo());
+                    null, plLogo);
             eb = listCommands(eb);
             eb.setFooter("RocketBot", null);
             e.reply(eb.build(), autoDeleteConsumer(e));

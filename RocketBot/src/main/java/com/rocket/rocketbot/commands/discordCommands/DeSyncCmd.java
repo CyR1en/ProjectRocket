@@ -10,7 +10,9 @@ import com.rocket.rocketbot.commands.DCommand;
 import com.rocket.rocketbot.entity.Messenger;
 import com.rocket.rocketbot.utils.FinderUtils;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.managers.GuildController;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.json.JSONObject;
 
 public class DeSyncCmd extends DCommand {
 
@@ -39,11 +41,21 @@ public class DeSyncCmd extends DCommand {
             return;
         }
         try {
-            Database.getJSONObject(pp.getUniqueId().toString()).remove(DataKey.DISCORD_ID.toString());
-            Database.getJSONObject(pp.getUniqueId().toString()).put(DataKey.DISCORD_ID.toString(), "Not Synced Yet");
-            Database.getJSONObject(pp.getUniqueId().toString()).remove(DataKey.DISCORD_USERNAME.toString());
-            Database.getJSONObject(pp.getUniqueId().toString()).put(DataKey.DISCORD_USERNAME.toString(), "Not Synced Yet");
-            SimplifiedDatabase.set(pp.getUniqueId().toString(), "Not Synced Yet");
+            String uuid = pp.getUniqueId().toString();
+            JSONObject data = Database.get(uuid);
+            if(data == null)
+                return;
+            GuildController controller = e.getGuild().getController();
+            String id = data.getString(DataKey.MC_GROUP.toString());
+            e.getGuild().getRolesByName(id, true).forEach(r -> controller.removeRolesFromMember(member, r).queue());
+            if(member.getEffectiveName().equals(pp.getName()))
+                controller.setNickname(member, "").queue();
+            data.remove(DataKey.DISCORD_ID.toString());
+            data.put(DataKey.DISCORD_ID.toString(), "Not Synced Yet");
+            data.remove(DataKey.DISCORD_USERNAME.toString());
+            data.put(DataKey.DISCORD_USERNAME.toString(), "Not Synced Yet");
+            Database.set(uuid, data);
+            SimplifiedDatabase.set(uuid, "Not Synced Yet");
             String msg = RocketBot.getLocale().getTranslatedMessage("dcommand.dsync-c3").f(member.getEffectiveName());
             e.reply(Messenger.embedMessage(e, msg, Messenger.ResponseLevel.SUCCESS));
         } catch (Exception ex) {

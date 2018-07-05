@@ -7,7 +7,9 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 
 import java.awt.*;
 import java.time.OffsetDateTime;
@@ -37,7 +39,7 @@ public class Broadcaster {
                 User selfUser = RocketBot.getInstance().getBot().getJda().getSelfUser();
                 Color c = tc.getGuild().getMember(selfUser).getColor();
                 MessageEmbed me = Messenger.embedMessage(rocketBot.getBot().getJda(),
-                        message, Messenger.ResponseLevel.SUCCESS, odt, c);
+                        message, Messenger.ResponseLevel.INFO, odt, c);
                 tc.sendMessage(me).queue();
             } else {
                 Message m = new MessageBuilder().append(message).build();
@@ -47,14 +49,24 @@ public class Broadcaster {
     }
 
     public void sendBroadcastToAllServer(String message) {
-        ProxyServer.getInstance().getPlayers().forEach(p -> p.chat(message));
+        ProxyServer.getInstance().getPlayers().forEach(p ->  {
+            TextComponent prefix = new TextComponent("[RocketBot] ");
+            prefix.setColor(ChatColor.GOLD);
+            TextComponent fMsg = new TextComponent(message);
+            fMsg.setColor(ChatColor.DARK_GREEN);
+
+            TextComponent tcMsg = new TextComponent();
+            tcMsg.addExtra(prefix);
+            tcMsg.addExtra(new TextComponent(message));
+            p.sendMessage(tcMsg);
+        });
     }
 
     public void loadChannels() {
         List<String> sChannels = rocketBot.getConfig().getTextChannels();
         rocketBot.findValidTextChannels(sChannels).forEach(tc -> {
             registeredChannels.add(tc);
-            rocketBot.getLogger().info(String.format(" - registered %s", tc.toString()));
+            rocketBot.getLogger().info(String.format("- registered %s", tc.toString()));
         });
     }
 }

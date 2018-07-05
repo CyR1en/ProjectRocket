@@ -28,7 +28,7 @@ public class SyncConfirm extends BCommand {
             authSession.authorize((ProxiedPlayer) commandSender, authToken);
         } catch (IllegalConfirmKeyException e) {
             commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                    "&6[MCBSync] &cThe verification code that you entered is invalid."));
+                    "&6[RocketBot] &cThe verification code that you entered is invalid."));
         }
     }
 }
