@@ -26,7 +26,8 @@ public class DUserJoin extends ListenerAdapter {
         tcs.forEach(tc -> {
             if(tc.getGuild().equals(event.getGuild())) {
                 EmbedBuilder eb = new EmbedBuilder();
-                eb.setDescription(RocketBot.getLocale().getTranslatedMessage("discord.welcome-w").f(event.getMember().getAsMention()));
+                eb.setImage(event.getMember().getUser().getAvatarUrl());
+                eb.setDescription(RocketBot.getLocale().getTranslatedMessage("discord.welcome-w").f(event.getMember().getEffectiveName()));
                 String fHeader = RocketBot.getLocale().getTranslatedMessage("discord.welcome-fh").finish();
                 String fContent = RocketBot.getLocale().getTranslatedMessage("discord.welcome-fc").finish();
                 eb.addField(fHeader, fContent, false);

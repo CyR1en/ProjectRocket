@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.rocket.rocketbot.RocketBot;
 import com.rocket.rocketbot.accountSync.Authentication.AuthSession;
 import com.rocket.rocketbot.accountSync.Authentication.AuthToken;
+import com.rocket.rocketbot.accountSync.SimplifiedDatabase;
 import com.rocket.rocketbot.commands.BCommand;
 import com.rocket.rocketbot.utils.FinderUtils;
 import net.dv8tion.jda.core.JDA;
@@ -29,13 +30,20 @@ public class Synchronize extends BCommand {
     @Override
     protected void doCommand(CommandSender commandSender, String[] args) {
         JDA jda = RocketBot.getInstance().getBot().getJda();
+        ProxiedPlayer pp = (ProxiedPlayer) commandSender;
+        if(!SimplifiedDatabase.get(pp.getUniqueId().toString()).equals("Not Synced yet")) {
+            User user = FinderUtils.findUserInDatabase(pp);
+            String message = RocketBot.getLocale().getTranslatedMessage("sync.synchronized").f(args[0], user.getName());
+            commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + message));
+            return;
+        }
         User dUser = StringUtils.isNumeric(args[0]) ? jda.getUserById(args[0]) : null;
         if (dUser == null)
             dUser = (FinderUtils.findMember(args[0]) == null) ? null : FinderUtils.findMember(args[0]).getUser();
         if (dUser != null) {
             if(FinderUtils.findPlayerInDatabase(dUser.getId()) != null) {
-                ProxiedPlayer pp = FinderUtils.findPlayerInDatabase(dUser.getId());
-                String message = RocketBot.getLocale().getTranslatedMessage("sync.synchronized").f(args[0], pp.getName());
+                ProxiedPlayer p1 = FinderUtils.findPlayerInDatabase(dUser.getId());
+                String message = RocketBot.getLocale().getTranslatedMessage("sync.synchronized").f(args[0], p1.getName());
                 commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + message));
                 return;
             }
@@ -46,8 +54,9 @@ public class Synchronize extends BCommand {
             dUser.openPrivateChannel().queue(pc -> pc.sendMessage(verificationCode(token)).queue(m -> {
                 m.addReaction(CANCEL).complete();
                 eventWaiter.waitForEvent(MessageReactionAddEvent.class, e -> e.getReaction().getReactionEmote().getName().equals(CANCEL) && e.getMessageId().equals(m.getId()) && !e.getUser().isBot(), a -> {
-                    a.getReaction().removeReaction().queue();
+                    m.clearReactions().queue();
                     authSession.cancel();
+                    m.getChannel().sendMessage(RocketBot.getLocale().getTranslatedMessage("session.cancelled").f("")).queue();
                 }, AuthSession.SYNC_TIMEOUT, TimeUnit.MINUTES, authSession::cancel);
                 String msg = RocketBot.getLocale().getTranslatedMessage("sync.pending").finish();
                 commandSender.sendMessage((ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + msg)));
