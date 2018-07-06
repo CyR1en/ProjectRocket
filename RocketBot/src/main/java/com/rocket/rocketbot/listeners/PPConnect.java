@@ -31,30 +31,36 @@ public class PPConnect extends SListener {
 
     @EventHandler
     public void handleReply(PluginMessageEvent event) {
-        if (event.getTag().equalsIgnoreCase("BungeeCord")) {
-            DataInputStream in = new DataInputStream(new ByteArrayInputStream(event.getData()));
-            try {
-                String channel = in.readUTF();
-                if (channel.equals("RIGQuery")) {
-                    String group = in.readUTF();
-                    String uuid = in.readUTF();
-                    ProxiedPlayer pp = ProxyServer.getInstance().getPlayer(UUID.fromString(uuid));
-                    if (!group.equals("null")) {
-                        if(!checkRole(pp, group)){
-                            String gr = Database.getJSONObject(pp.getUniqueId().toString()).getString(DataKey.MC_GROUP.toString());
-                            getRocketBot().getBot().removeRole(gr, pp);
-                            getRocketBot().getBot().handleRole(group, pp);
-                            JSONObject jsonObject =  Database.getJSONObject(pp.getUniqueId().toString());
-                            jsonObject.remove(DataKey.MC_GROUP.toString());
-                            jsonObject.put(DataKey.MC_GROUP.toString(), group);
-                            Database.set(pp.getUniqueId().toString(), jsonObject);
+        handleAsync(event);
+    }
+
+    void handleAsync(PluginMessageEvent event) {
+        ProxyServer.getInstance().getScheduler().runAsync(RocketBot.getInstance(), () -> {
+            if (event.getTag().equalsIgnoreCase("BungeeCord")) {
+                DataInputStream in = new DataInputStream(new ByteArrayInputStream(event.getData()));
+                try {
+                    String channel = in.readUTF();
+                    if (channel.equals("RIGQuery")) {
+                        String group = in.readUTF();
+                        String uuid = in.readUTF();
+                        ProxiedPlayer pp = ProxyServer.getInstance().getPlayer(UUID.fromString(uuid));
+                        if (!group.equals("null")) {
+                            if(!checkRole(pp, group)){
+                                String gr = Database.getJSONObject(pp.getUniqueId().toString()).getString(DataKey.MC_GROUP.toString());
+                                getRocketBot().getBot().removeRole(gr, pp);
+                                getRocketBot().getBot().handleRole(group, pp);
+                                JSONObject jsonObject =  Database.getJSONObject(pp.getUniqueId().toString());
+                                jsonObject.remove(DataKey.MC_GROUP.toString());
+                                jsonObject.put(DataKey.MC_GROUP.toString(), group);
+                                Database.set(pp.getUniqueId().toString(), jsonObject);
+                            }
                         }
                     }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
                 }
-            } catch (IOException e1) {
-                e1.printStackTrace();
             }
-        }
+        });
     }
 
     private boolean checkRole(ProxiedPlayer pp, String group) {

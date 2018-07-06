@@ -24,6 +24,7 @@ public class IGQuery implements PCM {
     public void handle(String s, Player player, byte[] bytes) {
         try {
             DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes));
+            in.readUTF(); //skip the first data
             String sUUID = in.readUTF();
             String group = rocketClient.getGroup(sUUID);
             rocketClient.sendToBungeeCord(player, "RIGQuery", group != null ? group : "null", player.getUniqueId().toString());

@@ -92,8 +92,10 @@ public class RocketClient extends JavaPlugin implements Initializable {
         RegisteredServiceProvider<LuckPermsApi> provider = Bukkit.getServicesManager().getRegistration(LuckPermsApi.class);
         if (provider != null) {
             LuckPermsApi api = provider.getProvider();
-
-            User user = api.getUser(UUID.fromString(uuid));
+            System.out.println("sUUD = " + uuid);
+            UUID uid = UUID.fromString(uuid);
+            Player p = Bukkit.getServer().getPlayer(uid);
+            User user = api.getUser(p.getUniqueId());
             if (user != null) {
                 Group group = api.getGroupManager().getGroup(user.getPrimaryGroup());
                 Optional<String> displayName = Optional.empty();

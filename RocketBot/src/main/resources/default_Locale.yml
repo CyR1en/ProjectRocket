@@ -14,6 +14,7 @@ sync:
   approved: 'Account sync approved!'
   cancelled: 'Account sync cancelled!'
   denied: 'Account sync denied!'
+  invalid-code: 'The verification code that you entered is invalid'
   cannot-send: 'Verification code cannot be sent because you are blocking Direct Messages. &aEnable Direct Messages and try again.'
   sent: 'A verification code have been sent to your Discord account %s'
   not-found: 'User not found'

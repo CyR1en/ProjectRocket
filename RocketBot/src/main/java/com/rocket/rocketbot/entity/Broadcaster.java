@@ -39,7 +39,7 @@ public class Broadcaster {
                 User selfUser = RocketBot.getInstance().getBot().getJda().getSelfUser();
                 Color c = tc.getGuild().getMember(selfUser).getColor();
                 MessageEmbed me = Messenger.embedMessage(rocketBot.getBot().getJda(),
-                        message, Messenger.ResponseLevel.INFO, odt, c);
+                        message, Messenger.ResponseLevel.BROADCAST, odt, c);
                 tc.sendMessage(me).queue();
             } else {
                 Message m = new MessageBuilder().append(message).build();

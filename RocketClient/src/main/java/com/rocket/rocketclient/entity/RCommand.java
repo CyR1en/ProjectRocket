@@ -20,6 +20,8 @@ public class RCommand implements PCM {
     @Override
     public void handle(String s, Player player, byte[] bytes) {
         String command = rocketClient.getRConfigManager().getGeneralConfig().getCommand();
+        command = command.replace("{player}", player.getName());
+        command = command.replaceAll("/", "").trim();
         Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
         Logger.info(String.format("[%s] Pong-2!", this.getClass().getSimpleName()));
     }
