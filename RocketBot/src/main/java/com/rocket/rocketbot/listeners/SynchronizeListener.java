@@ -23,7 +23,6 @@ public class SynchronizeListener extends SListener {
     public void sendGroupQuery(SynchronizeEvent event) {
         ServerInfo server = event.getProxiedPlayer().getServer().getInfo();
         getRocketBot().sendToBukkit("GQuery", event.getProxiedPlayer().getUniqueId().toString(), server);
-        getRocketBot().getLogger().info(String.format("[%s] Ping-1!", this.getClass().getSimpleName()));
     }
 
     @EventHandler
@@ -40,7 +39,6 @@ public class SynchronizeListener extends SListener {
                     if (!content.equals("null"))
                         getRocketBot().getBot().handleRole(content, pp);
                     getRocketBot().sendToBukkit("RCommand", "", server);
-                    getRocketBot().getLogger().info(String.format("[%s] Ping-2!", this.getClass().getSimpleName()));
                     String message = RocketBot.getLocale().getTranslatedMessage("sync.broadcast")
                             .f(pp.getName());
                     getRocketBot().getBroadcaster().sendBroadcastToAll(message, true);

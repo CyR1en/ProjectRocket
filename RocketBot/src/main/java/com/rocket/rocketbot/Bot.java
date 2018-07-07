@@ -134,17 +134,14 @@ public class Bot {
     }
 
     public void handleRole(String group, ProxiedPlayer p) {
-        System.out.println("handle role");
         if (group == null)
             return;
-        System.out.println("group != null");
         List<Guild> guilds = getJda().getGuilds();
         for (Guild g : guilds) {
             String id = SimplifiedDatabase.get(p.getUniqueId().toString());
             Member m = g.getMemberById(id);
             if (m == null)
                 continue;
-            System.out.println("m != null");
             GuildController controller = g.getController();
             if (PermissionUtil.canInteract(g.getMember(g.getJDA().getSelfUser()), m)) {
                 if (roleExists(g, group))

@@ -1,6 +1,5 @@
 package com.rocket.rocketclient.entity;
 
-import com.cyr1en.mcutils.logger.Logger;
 import com.rocket.rocketclient.RocketClient;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -32,7 +31,6 @@ public class GQuery implements PCM {
             String sUUID = in.readUTF();
             String group = rocketClient.getGroup(sUUID);
             rocketClient.sendToBungeeCord(player, rChannel, group != null ? group : "null", player.getUniqueId().toString());
-            Logger.info(String.format("[%s] Response: %s!", this.getClass().getSimpleName(), rChannel));
         } catch (IOException e) {
             e.printStackTrace();
         }

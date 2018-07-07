@@ -25,12 +25,10 @@ public class PPConnect extends SListener {
 
     @EventHandler
     public void onJoin(PostLoginEvent event) {
-        getRocketBot().getLogger().info("POST LOGIN: " + event.getPlayer());
         ProxyServer.getInstance().getScheduler().schedule(getRocketBot(), () -> {
             ProxiedPlayer p = event.getPlayer();
             ServerInfo server = event.getPlayer().getServer().getInfo();
             getRocketBot().sendToBukkit("IGQuery", p.getUniqueId().toString(), server);
-            getRocketBot().getLogger().info(String.format("IGQuery -> Backend (%s)", server.getName()));
         }, 5, TimeUnit.SECONDS);
     }
 
@@ -40,11 +38,8 @@ public class PPConnect extends SListener {
             DataInputStream in = new DataInputStream(new ByteArrayInputStream(event.getData()));
             try {
                 String channel = in.readUTF();
-                getRocketBot().getLogger().info(String.format("Event Channel: %s", channel));
                 if (!channel.equals("RIGQuery"))
                     return;
-                getRocketBot().getLogger().info("PLUGIN MESSAGE RECEIVED!");
-                getRocketBot().getLogger().info("Handling role change Asynchronously");
                 handle(event);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -53,31 +48,23 @@ public class PPConnect extends SListener {
     }
 
     private void handle(PluginMessageEvent event) {
-        getRocketBot().getLogger().info(String.format("Event tag: %s", event.getTag()));
         if (event.getTag().equalsIgnoreCase("BungeeCord")) {
             DataInputStream in = new DataInputStream(new ByteArrayInputStream(event.getData()));
             try {
                 String channel = in.readUTF();
-                getRocketBot().getLogger().info(String.format("Event Channel: %s", channel));
                 if (channel.equals("RIGQuery")) {
                     String group = in.readUTF();
                     String uuid = in.readUTF();
                     ProxiedPlayer pp = ProxyServer.getInstance().getPlayer(UUID.fromString(uuid));
-                    getRocketBot().getLogger().info(String.format("R Group: %s", group));
                     if (!group.equals("null")) {
                         if (!checkRole(pp, group)) {
-                            getRocketBot().getLogger().info("Role mismatch! synchronizing...");
                             String gr = Database.getJSONObject(pp.getUniqueId().toString()).getString(DataKey.MC_GROUP.toString());
                             getRocketBot().getBot().removeRole(gr, pp);
-                            getRocketBot().getLogger().info("Removed " + gr + " Role!");
                             getRocketBot().getBot().handleRole(group, pp);
-                            getRocketBot().getLogger().info("Role handled");
                             JSONObject jsonObject = Database.getJSONObject(pp.getUniqueId().toString());
                             jsonObject.remove(DataKey.MC_GROUP.toString());
                             jsonObject.put(DataKey.MC_GROUP.toString(), group);
                             Database.set(pp.getUniqueId().toString(), jsonObject);
-                            getRocketBot().getLogger().info("Database Updated");
-                            getRocketBot().getLogger().info("Finished group change handling!");
                         }
                     }
                 }
@@ -89,11 +76,8 @@ public class PPConnect extends SListener {
 
     private boolean checkRole(ProxiedPlayer pp, String group) {
         String gr = Database.getJSONObject(pp.getUniqueId().toString()).getString(DataKey.MC_GROUP.toString());
-        getRocketBot().getLogger().info(String.format("RGroup: %s | DGroup: %s", group, gr));
-        if (gr == null || gr.equals("Not Synced yet")) {
-            getRocketBot().getLogger().info("Skipped!");
+        if (gr == null || gr.equals("Not Synced yet"))
             return true; //return true to skip logic
-        }
         return gr.equals(group);
     }
 }
