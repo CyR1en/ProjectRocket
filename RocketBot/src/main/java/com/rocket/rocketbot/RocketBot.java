@@ -8,6 +8,8 @@ import com.rocket.rocketbot.commands.minecraftCommands.SyncConfirm;
 import com.rocket.rocketbot.commands.minecraftCommands.Synchronize;
 import com.rocket.rocketbot.configuration.SConfig;
 import com.rocket.rocketbot.entity.Broadcaster;
+import com.rocket.rocketbot.listeners.DeSyncListener;
+import com.rocket.rocketbot.listeners.PPConnect;
 import com.rocket.rocketbot.listeners.SynchronizeListener;
 import com.rocket.rocketbot.localization.Locale;
 import lombok.Getter;
@@ -67,6 +69,8 @@ public class RocketBot extends Plugin {
     private void registerListener() {
         getProxy().getPluginManager().registerListener(this, new SynchronizeListener(this));
         getProxy().getPluginManager().registerListener(this, new UserConnectionListener(this));
+        getProxy().getPluginManager().registerListener(this, new DeSyncListener(this));
+        getProxy().getPluginManager().registerListener(this, new PPConnect(this));
     }
 
     private void registerChannel() {

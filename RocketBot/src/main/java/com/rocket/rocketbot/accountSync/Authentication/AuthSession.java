@@ -25,35 +25,35 @@ public class AuthSession {
 
     public static final long SYNC_TIMEOUT = 5;
 
+    @Getter private RocketBot rocketBot;
     @Getter private ProxiedPlayer mcAcc;
     @Getter private User DiscordAcc;
     @Getter private AuthToken authToken;
     @Getter private Status status;
-    private AuthManager authManager;
     private ScheduledExecutorService scheduler;
     private String messageID;
 
     @Getter private final String sessionID = RandomStringUtils.randomNumeric(6);
 
-    public AuthSession(ProxiedPlayer mcAcc, User discordAcc, AuthManager authManager) {
+    public AuthSession(ProxiedPlayer mcAcc, User discordAcc, RocketBot rocketBot) {
+        this.rocketBot = rocketBot;
         this.mcAcc = mcAcc;
         this.DiscordAcc = discordAcc;
-        this.authManager = authManager;
         scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.schedule(this::cancel, SYNC_TIMEOUT, TimeUnit.MINUTES);
         authToken = new AuthToken(sessionID, mcAcc );
-        authManager.addSession(this);
+        rocketBot.getAuthManager().addSession(this);
         status = Status.PENDING;
         mcbSyncLog(SyncMessage.PENDING);
     }
 
     public AuthSession(ProxiedPlayer mcAcc, User discordAcc) {
-        this(mcAcc, discordAcc, RocketBot.getInstance().getAuthManager());
+        this(mcAcc, discordAcc, RocketBot.getInstance());
     }
 
     public void cancel() {
         if(status == Status.PENDING) {
-            authManager.removeSession(this.authToken.toString());
+            rocketBot.getAuthManager().removeSession(this.authToken.toString());
             status = Status.CANCELLED;
             mcbSyncLog(SyncMessage.CANCELLED);
             String msg = RocketBot.getLocale().getTranslatedMessage("sync.cancelled").finish();
@@ -90,15 +90,16 @@ public class AuthSession {
             getMcAcc().sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &a" + msg));
             mcbSyncLog(SyncMessage.APPROVED);
             UnifiedUser mcUser = new UnifiedUser(sender);
-            DUser mcbUser = new DUser(authManager.getSession(this.authToken.toString()).getDiscordAcc());
+            DUser mcbUser = new DUser(rocketBot.getAuthManager().getSession(this.authToken.toString()).getDiscordAcc());
             mcUser.setMcbUser(mcbUser);
             Database.set(mcUser.getProxiedPlayer().getUniqueId().toString(), new JSONObject(mcUser.getDataAsMap()));
-            authManager.removeSession(this.getSessionID());
+            rocketBot.getAuthManager().removeSession(this.getAuthToken().toString());
+            scheduler.shutdownNow();
             ProxyServer.getInstance().getPluginManager().callEvent(new SynchronizeEvent(sender, mcUser));
         } else {
             String msg = RocketBot.getLocale().getTranslatedMessage("sync.cancelled").finish();
             getMcAcc().sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &c" + msg));
-            authManager.removeSession(this.getSessionID());
+            rocketBot.getAuthManager().removeSession(this.getSessionID());
         }
     }
 

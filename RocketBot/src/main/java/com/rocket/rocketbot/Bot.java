@@ -16,6 +16,7 @@ import com.rocket.rocketbot.commands.discordCommands.ReloadCmd;
 import com.rocket.rocketbot.entity.Messenger;
 import com.rocket.rocketbot.listeners.BotReady;
 import com.rocket.rocketbot.listeners.DUserJoin;
+import com.rocket.rocketbot.listeners.DUserLeave;
 import lombok.Getter;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
@@ -90,6 +91,7 @@ public class Bot {
     private void initListeners() {
         jda.addEventListener(eventWaiter);
         jda.addEventListener(new DUserJoin(rocketBot));
+        jda.addEventListener(new DUserLeave(rocketBot));
         jda.addEventListener(new BotReady(rocketBot));
     }
 
@@ -122,25 +124,27 @@ public class Bot {
             String id = SimplifiedDatabase.get(pp.getUniqueId().toString());
             Member m = guild.getMemberById(id);
             GuildController gc = guild.getController();
-            Member gMember = guild.getMemberById(m.getUser().getId());
-            if(gMember != null) {
-                guild.getRolesByName(role, true).forEach(r -> {
-                    if(gMember.getRoles().contains(r))
-                        gc.removeRolesFromMember(gMember, r).queue();
-                });
+            if(m != null) {
+                guild.getRolesByName(role, true).forEach(r -> m.getRoles().forEach(rr -> {
+                    if(rr.getName().equalsIgnoreCase(role))
+                        gc.removeSingleRoleFromMember(m, rr).queue();
+                }));
             }
         }
     }
 
     public void handleRole(String group, ProxiedPlayer p) {
+        System.out.println("handle role");
         if (group == null)
             return;
+        System.out.println("group != null");
         List<Guild> guilds = getJda().getGuilds();
         for (Guild g : guilds) {
             String id = SimplifiedDatabase.get(p.getUniqueId().toString());
             Member m = g.getMemberById(id);
             if (m == null)
                 continue;
+            System.out.println("m != null");
             GuildController controller = g.getController();
             if (PermissionUtil.canInteract(g.getMember(g.getJDA().getSelfUser()), m)) {
                 if (roleExists(g, group))
@@ -156,7 +160,7 @@ public class Bot {
                 }
                 controller.setNickname(m, p.getName()).queue();
             } else {
-                String message = String.format("The bot cannot modify the role or nickname for %s because %s has a higher or equal highest!", m.getEffectiveName(), m.getEffectiveName());
+                String message = String.format("The bot cannot modify the role or nickname for %s because %s has a higher or equal role in %s!", m.getEffectiveName(), m.getEffectiveName(), g);
                 rocketBot.getLogger().warning(message);
             }
         }

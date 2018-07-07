@@ -16,9 +16,12 @@ public class GQuery implements PCM {
     @Getter
     private String name;
 
+    private String rChannel;
+
     public GQuery(RocketClient rocketClient) {
         this.rocketClient = rocketClient;
         name = "GQuery";
+        rChannel = "RQuery";
     }
 
     @Override
@@ -28,8 +31,8 @@ public class GQuery implements PCM {
             in.readUTF(); //skip the first data
             String sUUID = in.readUTF();
             String group = rocketClient.getGroup(sUUID);
-            rocketClient.sendToBungeeCord(player, "RQuery", group != null ? group : "null", player.getUniqueId().toString());
-            Logger.info(String.format("[%s] Pong-1!", this.getClass().getSimpleName()));
+            rocketClient.sendToBungeeCord(player, rChannel, group != null ? group : "null", player.getUniqueId().toString());
+            Logger.info(String.format("[%s] Response: %s!", this.getClass().getSimpleName(), rChannel));
         } catch (IOException e) {
             e.printStackTrace();
         }

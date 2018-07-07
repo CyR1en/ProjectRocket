@@ -17,9 +17,12 @@ sync:
   invalid-code: 'The verification code that you entered is invalid'
   cannot-send: 'Verification code cannot be sent because you are blocking Direct Messages. &aEnable Direct Messages and try again.'
   sent: 'A verification code have been sent to your Discord account %s'
+  in-session: 'You''re already in authentication session!'
   not-found: 'User not found'
   broadcast: '%s has synchronized their account and received a reward'
   synchronized: 'The user %s is already synchronized to %s!'
+  synchronized-1: 'You''re already synchronized to %s'
+  desync: 'You have been desynchronized!'
   message: '**Sync Verification Code**:
            ```%s```
           Copy the verification code above and do __**/syncconfirm <verification code>**__ in-game.

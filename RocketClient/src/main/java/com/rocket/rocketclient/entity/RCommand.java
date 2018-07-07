@@ -1,6 +1,5 @@
 package com.rocket.rocketclient.entity;
 
-import com.cyr1en.mcutils.logger.Logger;
 import com.rocket.rocketclient.RocketClient;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -23,7 +22,6 @@ public class RCommand implements PCM {
         command = command.replace("{player}", player.getName());
         command = command.replaceAll("/", "").trim();
         Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
-        Logger.info(String.format("[%s] Pong-2!", this.getClass().getSimpleName()));
     }
 
 }

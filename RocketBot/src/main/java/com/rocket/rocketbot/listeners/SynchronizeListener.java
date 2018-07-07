@@ -39,7 +39,7 @@ public class SynchronizeListener extends SListener {
                     ServerInfo server = pp.getServer().getInfo();
                     if (!content.equals("null"))
                         getRocketBot().getBot().handleRole(content, pp);
-                    getRocketBot().sendToBukkit("command", "", server);
+                    getRocketBot().sendToBukkit("RCommand", "", server);
                     getRocketBot().getLogger().info(String.format("[%s] Ping-2!", this.getClass().getSimpleName()));
                     String message = RocketBot.getLocale().getTranslatedMessage("sync.broadcast")
                             .f(pp.getName());

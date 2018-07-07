@@ -8,9 +8,11 @@ import com.rocket.rocketbot.accountSync.Database;
 import com.rocket.rocketbot.accountSync.SimplifiedDatabase;
 import com.rocket.rocketbot.commands.DCommand;
 import com.rocket.rocketbot.entity.Messenger;
+import com.rocket.rocketbot.events.DeSynchronizeEvent;
 import com.rocket.rocketbot.utils.FinderUtils;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.managers.GuildController;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
@@ -50,14 +52,17 @@ public class DeSyncCmd extends DCommand {
             e.getGuild().getRolesByName(id, true).forEach(r -> controller.removeRolesFromMember(member, r).queue());
             if(member.getEffectiveName().equals(pp.getName()))
                 controller.setNickname(member, "").queue();
-            data.remove(DataKey.DISCORD_ID.toString());
-            data.put(DataKey.DISCORD_ID.toString(), "Not Synced Yet");
-            data.remove(DataKey.DISCORD_USERNAME.toString());
-            data.put(DataKey.DISCORD_USERNAME.toString(), "Not Synced Yet");
+            for (DataKey dataKey : DataKey.values()) {
+                if(dataKey.equals(DataKey.MC_USERNAME))
+                    continue;
+                data.remove(dataKey.toString());
+                data.put(dataKey.toString(), "Not Synced yet");
+            }
             Database.set(uuid, data);
-            SimplifiedDatabase.set(uuid, "Not Synced Yet");
+            SimplifiedDatabase.set(uuid, "Not Synced yet");
             String msg = RocketBot.getLocale().getTranslatedMessage("dcommand.dsync-c3").f(member.getEffectiveName());
             e.reply(Messenger.embedMessage(e, msg, Messenger.ResponseLevel.SUCCESS));
+            ProxyServer.getInstance().getPluginManager().callEvent(new DeSynchronizeEvent(pp));
         } catch (Exception ex) {
             String msg = RocketBot.getLocale().getTranslatedMessage("dcommand.dsync-fail").finish();
             e.reply(Messenger.embedMessage(e, msg, Messenger.ResponseLevel.ERROR), autoDeleteConsumer(e));

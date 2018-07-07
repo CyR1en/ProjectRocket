@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.rocket.rocketbot.RocketBot;
 import com.rocket.rocketbot.accountSync.Authentication.AuthSession;
 import com.rocket.rocketbot.accountSync.Authentication.AuthToken;
+import com.rocket.rocketbot.accountSync.SimplifiedDatabase;
 import com.rocket.rocketbot.commands.BCommand;
 import com.rocket.rocketbot.utils.FinderUtils;
 import net.dv8tion.jda.core.JDA;
@@ -31,14 +32,16 @@ public class Synchronize extends BCommand {
         JDA jda = RocketBot.getInstance().getBot().getJda();
         ProxiedPlayer pp = (ProxiedPlayer) commandSender;
         if(getRocketBot().getAuthManager().inSession(pp)) {
-            String message = RocketBot.getLocale().getTranslatedMessage("sync.pending").finish();
-            commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + message));
+            String message = RocketBot.getLocale().getTranslatedMessage("sync.in-session").finish();
+            commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &c" + message));
             return;
         }
-        User dUser = FinderUtils.findUserInDatabase(pp);
-        if(dUser != null) {
-            String message = RocketBot.getLocale().getTranslatedMessage("sync.synchronized").f(args[0], dUser.getName());
-            commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + message));
+        String s = SimplifiedDatabase.get(pp.getUniqueId().toString());
+        User dUser;
+        if (s != null && !s.equals("Not Synced yet")) {
+            dUser = getRocketBot().getBot().getJda().getUserById(SimplifiedDatabase.get(pp.getUniqueId().toString()));
+            String message = RocketBot.getLocale().getTranslatedMessage("sync.synchronized-1").f(dUser.getName());
+            commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &c" + message));
             return;
         }
         dUser = StringUtils.isNumeric(args[0]) ? jda.getUserById(args[0]) : null;
@@ -48,7 +51,7 @@ public class Synchronize extends BCommand {
             if(FinderUtils.findPlayerInDatabase(dUser.getId()) != null) {
                 ProxiedPlayer p1 = FinderUtils.findPlayerInDatabase(dUser.getId());
                 String message = RocketBot.getLocale().getTranslatedMessage("sync.synchronized").f(args[0], p1.getName());
-                commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + message));
+                commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &c" + message));
                 return;
             }
             AuthSession authSession = new AuthSession((ProxiedPlayer) commandSender, dUser);
@@ -62,7 +65,7 @@ public class Synchronize extends BCommand {
                     m.getChannel().sendMessage(RocketBot.getLocale().getTranslatedMessage("session.cancelled").f("")).queue();
                 }, AuthSession.SYNC_TIMEOUT, TimeUnit.MINUTES, authSession::cancel);
                 String msg = RocketBot.getLocale().getTranslatedMessage("sync.pending").finish();
-                commandSender.sendMessage((ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + msg)));
+                commandSender.sendMessage((ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &a" + msg)));
                 msg = RocketBot.getLocale().getTranslatedMessage("sync.sent").f(finalDUser1.getName() + "(" + finalDUser1.getId() + ")");
                 commandSender.sendMessage((ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + msg)));
             }, t -> {
@@ -74,7 +77,7 @@ public class Synchronize extends BCommand {
             });
         } else {
             String msg = RocketBot.getLocale().getTranslatedMessage("sync.not-found").finish();
-            commandSender.sendMessage((ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &r" + msg)));
+            commandSender.sendMessage((ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &c" + msg)));
         }
     }
 
@@ -84,6 +87,6 @@ public class Synchronize extends BCommand {
 
     private String cannotSendCode() {
         String msg = RocketBot.getLocale().getTranslatedMessage("sync.cannot-send").finish();
-        return "&6[RocketBot] &r" + msg;
+        return "&6[RocketBot] &c" + msg;
     }
 }
