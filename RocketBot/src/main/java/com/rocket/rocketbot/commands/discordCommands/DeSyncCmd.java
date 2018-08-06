@@ -9,7 +9,7 @@ import com.rocket.rocketbot.accountSync.SimplifiedDatabase;
 import com.rocket.rocketbot.commands.DCommand;
 import com.rocket.rocketbot.entity.Messenger;
 import com.rocket.rocketbot.events.DeSynchronizeEvent;
-import com.rocket.rocketbot.utils.FinderUtils;
+import com.rocket.rocketbot.utils.Finder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.managers.GuildController;
 import net.md_5.bungee.api.ProxyServer;
@@ -30,36 +30,36 @@ public class DeSyncCmd extends DCommand {
 
     @Override
     protected void doCommand(CommandEvent e) {
-        Member member = FinderUtils.findMember(e.getArgs());
-        if(member == null) {
+        Member member = Finder.findMember(e.getArgs());
+        if (member == null) {
             String msg = RocketBot.getLocale().getTranslatedMessage("dcommand.dsync-c1").f(e.getArgs());
             e.reply(Messenger.embedMessage(e, msg, Messenger.ResponseLevel.WARNING), autoDeleteConsumer(e));
             return;
         }
-        ProxiedPlayer pp = FinderUtils.findPlayerInDatabase(member.getUser().getId());
-        if(pp == null) {
+        ProxiedPlayer pp = Finder.findPlayerInDatabase(member.getUser().getId());
+        if (pp == null) {
             String msg = RocketBot.getLocale().getTranslatedMessage("dcommand.dsync-c2").f(e.getArgs());
             e.reply(Messenger.embedMessage(e, msg, Messenger.ResponseLevel.WARNING), autoDeleteConsumer(e));
             return;
         }
         try {
-            String uuid = pp.getUniqueId().toString();
-            JSONObject data = Database.get(uuid);
-            if(data == null)
+            String key = pp.getName();
+            JSONObject data = Database.get(key);
+            if (data == null)
                 return;
             GuildController controller = e.getGuild().getController();
             String id = data.getString(DataKey.MC_GROUP.toString());
             e.getGuild().getRolesByName(id, true).forEach(r -> controller.removeRolesFromMember(member, r).queue());
-            if(member.getEffectiveName().equals(pp.getName()))
+            if (member.getEffectiveName().equals(pp.getName()))
                 controller.setNickname(member, "").queue();
             for (DataKey dataKey : DataKey.values()) {
-                if(dataKey.equals(DataKey.MC_USERNAME))
+                if (dataKey.equals(DataKey.REWARDED))
                     continue;
                 data.remove(dataKey.toString());
                 data.put(dataKey.toString(), "Not Synced yet");
             }
-            Database.set(uuid, data);
-            SimplifiedDatabase.set(uuid, "Not Synced yet");
+            Database.set(key, data);
+            SimplifiedDatabase.set(key, "Not Synced yet");
             String msg = RocketBot.getLocale().getTranslatedMessage("dcommand.dsync-c3").f(member.getEffectiveName());
             e.reply(Messenger.embedMessage(e, msg, Messenger.ResponseLevel.SUCCESS));
             ProxyServer.getInstance().getPluginManager().callEvent(new DeSynchronizeEvent(pp));

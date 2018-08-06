@@ -23,7 +23,7 @@ public class DUserJoin extends ListenerAdapter {
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         rocketBot.getLogger().info(String.format("New member joined (%s)", event.getMember().getEffectiveName()));
-        List<TextChannel> tcs = rocketBot.getBroadcaster().getRegisteredChannels();
+        List<TextChannel> tcs = rocketBot.getBroadcaster().getRegisteredSyncChannels();
         tcs.forEach(tc -> {
             if(tc.getGuild().equals(event.getGuild())) {
                 EmbedBuilder eb = new EmbedBuilder();

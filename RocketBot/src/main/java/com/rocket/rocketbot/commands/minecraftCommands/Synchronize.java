@@ -6,7 +6,7 @@ import com.rocket.rocketbot.accountSync.Authentication.AuthSession;
 import com.rocket.rocketbot.accountSync.Authentication.AuthToken;
 import com.rocket.rocketbot.accountSync.SimplifiedDatabase;
 import com.rocket.rocketbot.commands.BCommand;
-import com.rocket.rocketbot.utils.FinderUtils;
+import com.rocket.rocketbot.utils.Finder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
@@ -39,17 +39,17 @@ public class Synchronize extends BCommand {
         String s = SimplifiedDatabase.get(pp.getUniqueId().toString());
         User dUser;
         if (s != null && !s.equals("Not Synced yet")) {
-            dUser = getRocketBot().getBot().getJda().getUserById(SimplifiedDatabase.get(pp.getUniqueId().toString()));
+            dUser = getRocketBot().getBot().getJda().getUserById(SimplifiedDatabase.get(pp.getName()));
             String message = RocketBot.getLocale().getTranslatedMessage("sync.synchronized-1").f(dUser.getName());
             commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &c" + message));
             return;
         }
         dUser = StringUtils.isNumeric(args[0]) ? jda.getUserById(args[0]) : null;
         if (dUser == null)
-            dUser = (FinderUtils.findMember(args[0]) == null) ? null : FinderUtils.findMember(args[0]).getUser();
+            dUser = (Finder.findMember(args[0]) == null) ? null : Finder.findMember(args[0]).getUser();
         if (dUser != null) {
-            if(FinderUtils.findPlayerInDatabase(dUser.getId()) != null) {
-                ProxiedPlayer p1 = FinderUtils.findPlayerInDatabase(dUser.getId());
+            if(Finder.findPlayerInDatabase(dUser.getId()) != null) {
+                ProxiedPlayer p1 = Finder.findPlayerInDatabase(dUser.getId());
                 String message = RocketBot.getLocale().getTranslatedMessage("sync.synchronized").f(args[0], p1.getName());
                 commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &c" + message));
                 return;

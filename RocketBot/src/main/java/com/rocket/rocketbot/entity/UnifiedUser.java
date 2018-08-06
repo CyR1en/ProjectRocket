@@ -2,7 +2,7 @@ package com.rocket.rocketbot.entity;
 
 
 import com.rocket.rocketbot.accountSync.AccountDataFormat;
-import com.rocket.rocketbot.utils.FinderUtils;
+import com.rocket.rocketbot.utils.Finder;
 import lombok.Getter;
 import net.dv8tion.jda.core.entities.User;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -17,7 +17,7 @@ public class UnifiedUser {
 
     public UnifiedUser(ProxiedPlayer p) {
         this.proxiedPlayer = p;
-        User user = FinderUtils.findUserInDatabase(p);
+        User user = Finder.findUserInDatabase(p);
         this.dUser = user == null ? null : new DUser(user);
     }
 
@@ -26,7 +26,7 @@ public class UnifiedUser {
         this.dUser = dUser;
     }
 
-    public void setMcbUser(DUser dUser) {
+    public void setDUser(DUser dUser) {
         this.dUser = dUser;
     }
 

@@ -21,26 +21,22 @@ public class UserConnectionListener extends SListener {
 
     @EventHandler
     public void onJoin(PostLoginEvent event) {
-        JSONObject data = Database.get(event.getPlayer().getUniqueId().toString());
+        JSONObject data = Database.get(event.getPlayer().getName());
         UnifiedUser unifiedUser = new UnifiedUser(event.getPlayer());
-        if(data == null) {
-            Database.set(unifiedUser.getProxiedPlayer().getUniqueId().toString(), new JSONObject(unifiedUser.getDataAsMap()));
-        } else if (checkDataNodes(unifiedUser, data)){
-            if(!data.get(DataKey.MC_USERNAME.toString()).equals(event.getPlayer().getName())) {
-                data.put(DataKey.MC_USERNAME.toString(), event.getPlayer().getName());
-                Database.set(event.getPlayer().getUniqueId().toString(), new JSONObject(data));
-            }
+        if (data == null) {
+            Database.set(unifiedUser.getProxiedPlayer().getName(), new JSONObject(unifiedUser.getDataAsMap()));
         } else {
-            getRocketBot().getLogger().log(Level.WARNING, "There was an issue with " + event.getPlayer().getName() + "'s account sync data and have been re-initiated.");
+            if (!checkDataNodes(unifiedUser, data))
+                getRocketBot().getLogger().log(Level.WARNING, "There was an issue with " + event.getPlayer().getName() + "'s account sync data and have been re-initiated.");
         }
     }
 
     private boolean checkDataNodes(UnifiedUser unifiedUser, JSONObject data) {
-        for(DataKey dataKey : DataKey.values())
+        for (DataKey dataKey : DataKey.values())
             try {
                 data.get(dataKey.toString());
             } catch (JSONException ex) {
-                Database.set(unifiedUser.getProxiedPlayer().getUniqueId().toString(), new JSONObject(unifiedUser.getDataAsMap()));
+                Database.set(unifiedUser.getProxiedPlayer().getName(), new JSONObject(unifiedUser.getDataAsMap()));
                 return false;
             }
         return true;

@@ -10,7 +10,10 @@ import com.rocket.rocketclient.configuration.files.ClientConfig;
 import com.rocket.rocketclient.entity.GQuery;
 import com.rocket.rocketclient.entity.IGQuery;
 import com.rocket.rocketclient.entity.RCommand;
+import com.rocket.rocketclient.listeners.BanListener;
 import com.rocket.rocketclient.listeners.PluginChannelListener;
+import com.rocket.rocketclient.listeners.UserConnect;
+import litebans.api.Events;
 import lombok.Getter;
 import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
@@ -21,6 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.messaging.PluginMessageRecipient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -31,15 +35,13 @@ import java.util.UUID;
 
 public class RocketClient extends JavaPlugin implements Initializable {
 
-    private static RocketClient instance;
+    @Getter private static RocketClient instance;
 
-    @Getter
-    private RConfigManager rConfigManager;
+    @Getter private RConfigManager rConfigManager;
 
     @Override
     public void onEnable() {
-        Logger.init(this.getDescription().getName());
-        Initializer.initAll(this);
+        Bukkit.getScheduler().runTaskLater(this, () -> Initializer.initAll(this), 1L);
     }
 
     @Override
@@ -67,25 +69,26 @@ public class RocketClient extends JavaPlugin implements Initializable {
         Logger.info(" - Now listening for Plugin Messages from BungeeCord");
     }
 
-    public RocketClient getInstance() {
-        if (instance == null)
-            instance = new RocketClient();
-        return instance;
+    @Initialize(priority = 2)
+    public void initListeners() {
+        getServer().getPluginManager().registerEvents(new UserConnect(this), this);
+        Events.get().register(new BanListener(this));
     }
 
-    public void sendToBungeeCord(Player p, String channel, String sub, String... other) {
+
+    public void sendToBungeeCord(PluginMessageRecipient r, String channel, String main, String... other) {
         ByteArrayOutputStream b = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(b);
         try {
             out.writeUTF(channel);
-            out.writeUTF(sub);
+            out.writeUTF(main);
             for (String o : other) {
                 out.writeUTF(o);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        p.sendPluginMessage(RocketClient.getPlugin(RocketClient.class), "BungeeCord", b.toByteArray());
+        r.sendPluginMessage(RocketClient.getPlugin(RocketClient.class), "BungeeCord", b.toByteArray());
     }
 
     public String getGroup(String uuid) {

@@ -54,7 +54,8 @@ public class Messenger {
         WARNING(new Color(243, 119, 54), RocketBot.getLocale().getTranslatedMessage("responselevel.lvl2").finish()),
         ERROR(new Color(188, 75, 79), RocketBot.getLocale().getTranslatedMessage("responselevel.lvl3").finish()),
         INFO(RocketBot.getLocale().getTranslatedMessage("responselevel.information").finish()),
-        BROADCAST(RocketBot.getLocale().getTranslatedMessage("responselevel.broadcast").finish());
+        BROADCAST(RocketBot.getLocale().getTranslatedMessage("responselevel.broadcast").finish()),
+        LB_BROADCAST(RocketBot.getLocale().getTranslatedMessage("responselevel.lbbroadcast").finish());
 
         @Getter private Color color;
         @Getter private String footer;

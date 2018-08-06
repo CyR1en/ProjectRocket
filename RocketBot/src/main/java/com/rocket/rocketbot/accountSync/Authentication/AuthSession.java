@@ -64,7 +64,7 @@ public class AuthSession {
 
     public void authorize(ProxiedPlayer sender, AuthToken token) {
         boolean authenticated = false;
-        if(token.getMcAcc().getUniqueId().equals(sender.getUniqueId())) {
+        if(token.getMcAcc().getName().equals(sender.getName())) {
             try {
                 authenticated = authToken.authenticateToken(token);
             } catch (IllegalConfirmRequesterException illegalConfirmRequester) {
@@ -90,9 +90,9 @@ public class AuthSession {
             getMcAcc().sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &a" + msg));
             mcbSyncLog(SyncMessage.APPROVED);
             UnifiedUser mcUser = new UnifiedUser(sender);
-            DUser mcbUser = new DUser(rocketBot.getAuthManager().getSession(this.authToken.toString()).getDiscordAcc());
-            mcUser.setMcbUser(mcbUser);
-            Database.set(mcUser.getProxiedPlayer().getUniqueId().toString(), new JSONObject(mcUser.getDataAsMap()));
+            DUser du = new DUser(rocketBot.getAuthManager().getSession(this.authToken.toString()).getDiscordAcc());
+            mcUser.setDUser(du);
+            Database.set(mcUser.getProxiedPlayer().getName(), new JSONObject(mcUser.getDataAsMap()));
             rocketBot.getAuthManager().removeSession(this.getAuthToken().toString());
             scheduler.shutdownNow();
             ProxyServer.getInstance().getPluginManager().callEvent(new SynchronizeEvent(sender, mcUser));

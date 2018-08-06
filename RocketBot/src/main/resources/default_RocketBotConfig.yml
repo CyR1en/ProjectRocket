@@ -36,9 +36,26 @@ Default_Game: default
 # <               All bot configuration                >
 # +----------------------------------------------------+
 
-TextChannel:
+# This is your support voice channels.
+# If someone joins these channels, it will
+# send a message to ops in-game.
+VoiceChannels:
+  - '123123123'
+  - '123123123'
+
+# This is your broadcast channels.
+# When someone joins your Discord or
+# someone synchronize their account
+# the bot will send the message here.
+SyncChannels:
   - '123456789'
   - '987654321'
+
+# When someone gets banned in-game,
+# send a broadcast to these channels.
+BanChannels:
+  - '12121212'
+  - '123123123'
 
 # This will be the logo of the plugin and will be seen when help command
 # is executed.

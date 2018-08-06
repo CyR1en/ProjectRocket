@@ -9,23 +9,26 @@ import com.rocket.rocketbot.commands.minecraftCommands.Synchronize;
 import com.rocket.rocketbot.configuration.SConfig;
 import com.rocket.rocketbot.entity.Broadcaster;
 import com.rocket.rocketbot.listeners.DeSyncListener;
+import com.rocket.rocketbot.listeners.LBBroadcast;
 import com.rocket.rocketbot.listeners.PPConnect;
 import com.rocket.rocketbot.listeners.SynchronizeListener;
 import com.rocket.rocketbot.localization.Locale;
+import com.rocket.rocketbot.utils.Finder;
 import lombok.Getter;
-import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Channel;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.stream.Collectors;
 
 public class RocketBot extends Plugin {
 
@@ -71,6 +74,7 @@ public class RocketBot extends Plugin {
         getProxy().getPluginManager().registerListener(this, new UserConnectionListener(this));
         getProxy().getPluginManager().registerListener(this, new DeSyncListener(this));
         getProxy().getPluginManager().registerListener(this, new PPConnect(this));
+        getProxy().getPluginManager().registerListener(this, new LBBroadcast(this));
     }
 
     private void registerChannel() {
@@ -83,23 +87,13 @@ public class RocketBot extends Plugin {
     }
 
     public List<TextChannel> findValidTextChannels(List<String> tcID) {
-        List<TextChannel> out = new ArrayList<>();
-        tcID.forEach((s) -> {
-            if (!s.isEmpty() && bot.getJda() != null) {
-                if(StringUtils.isNumeric(s)) {
-                    TextChannel tc = bot.getJda().getTextChannelById(s);
-                    if (tc != null)
-                        out.add(tc);
-                } else {
-                    List<Guild> guilds = bot.getJda().getGuilds();
-                    guilds.forEach(g -> g.getTextChannels().forEach(tc -> {
-                        if(tc.getName().equals(s))
-                            out.add(tc);
-                    }));
-                }
-            }
-        });
-        return out;
+        List<Channel> generic = Finder.findValidChannels(TextChannel.class, tcID);
+        return generic.stream().filter(Objects::nonNull).map(e -> (TextChannel) e).collect(Collectors.toList()) ;
+    }
+
+    public List<VoiceChannel> findValidVoiceChannel(List<String> vcID) {
+        List<Channel> generic = Finder.findValidChannels(VoiceChannel.class, vcID);
+        return generic.stream().filter(Objects::nonNull).map(e -> (VoiceChannel) e).collect(Collectors.toList()) ;
     }
 
     public static Locale getLocale() {

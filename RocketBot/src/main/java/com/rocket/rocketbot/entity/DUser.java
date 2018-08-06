@@ -2,7 +2,7 @@ package com.rocket.rocketbot.entity;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rocket.rocketbot.RocketBot;
-import com.rocket.rocketbot.utils.FinderUtils;
+import com.rocket.rocketbot.utils.Finder;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.core.entities.Guild;
@@ -50,7 +50,7 @@ public class DUser {
     }
 
     public ProxiedPlayer parseAsPlayer() {
-        return FinderUtils.findPlayerInDatabase(this.ID);
+        return Finder.findPlayerInDatabase(this.ID);
     }
 
     @Override

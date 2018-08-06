@@ -39,7 +39,13 @@ public class SConfig extends SFile {
     }
 
     public List<String> getTextChannels() {
-        return getConfig().getStringList("TextChannel");
+        return getConfig().getStringList("TextChannels");
     }
+
+    public List<String> getVoiceChannels() {
+        return getConfig().getStringList("VoiceChannels");
+    }
+
+    public List<String> getBanChannels() { return getConfig().getStringList("BanChannels");}
 
 }

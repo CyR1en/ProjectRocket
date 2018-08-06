@@ -8,5 +8,5 @@ allprojects {
 }
 
 subprojects {
-    version '1.1_r'
+    version '1.3_b1'
 }

@@ -4,6 +4,10 @@ responselevel:
   lvl3: 'Error'
   information: 'Information'
   broadcast: 'Broadcast'
+  lbbroadcast: 'LiteBans Broadcast'
+support:
+  join: 'The user %s joined the support channel %s!'
+  leave: 'The user %s left the support channel %s!'
 session:
   start: 'Sync session started! %s'
   approved: 'Sync session approved! %s'

@@ -121,7 +121,7 @@ public class Bot {
     public void removeRole(String role, ProxiedPlayer pp) {
         List<Guild> guilds = getJda().getGuilds();
         for (Guild guild : guilds) {
-            String id = SimplifiedDatabase.get(pp.getUniqueId().toString());
+            String id = SimplifiedDatabase.get(pp.getName());
             Member m = guild.getMemberById(id);
             GuildController gc = guild.getController();
             if(m != null) {
@@ -138,7 +138,7 @@ public class Bot {
             return;
         List<Guild> guilds = getJda().getGuilds();
         for (Guild g : guilds) {
-            String id = SimplifiedDatabase.get(p.getUniqueId().toString());
+            String id = SimplifiedDatabase.get(p.getName());
             Member m = g.getMemberById(id);
             if (m == null)
                 continue;
@@ -164,10 +164,10 @@ public class Bot {
     }
 
     private void setDB(ProxiedPlayer p, Role r) {
-        JSONObject data = Database.getJSONObject(p.getUniqueId().toString());
+        JSONObject data = Database.getJSONObject(p.getName());
         data.remove(DataKey.MC_GROUP.toString());
         data.put(DataKey.MC_GROUP.toString(), r.getName());
-        Database.set(p.getUniqueId().toString(), data);
+        Database.set(p.getName(), data);
     }
 
     private boolean roleExists(Guild g, String role) {
