@@ -23,8 +23,13 @@ public class ClientConfig extends BaseConfig {
         return getString(CNode.COMMAND);
     }
 
+    public String getRCommand() {
+        return getString(CNode.R_COMMAND);
+    }
+
     enum CNode implements Node {
-        COMMAND("Command", new String[]{"command to be dispatched", "when a player syncs their", "accounts"}, "say cheese!");
+        COMMAND("Command", new String[]{"command to be dispatched", "when a player syncs their", "accounts"}, "say cheese!"),
+        R_COMMAND("RCommand", new String[]{"command to be dispatched", "for player who wan the raffle"}, "say Reeewwwaarrds!");
 
         private String key;
         private String[] comment;

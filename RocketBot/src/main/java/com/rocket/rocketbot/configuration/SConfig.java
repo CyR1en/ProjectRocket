@@ -46,6 +46,20 @@ public class SConfig extends SFile {
         return getConfig().getStringList("VoiceChannels");
     }
 
-    public List<String> getBanChannels() { return getConfig().getStringList("BanChannels");}
+    public List<String> getBanChannels() {
+        return getConfig().getStringList("BanChannels");
+    }
+
+    public List<String> getRewardChannels() {
+        return getConfig().getStringList("RewardChannels");
+    }
+
+    public long getPeriod() {
+        return getConfig().getLong("Period");
+    }
+
+    public int getMinCount() {
+        return getConfig().getInt("MinCount");
+    }
 
 }
