@@ -36,6 +36,22 @@ Default_Game: default
 # <               All bot configuration                >
 # +----------------------------------------------------+
 
+# This will be the logo of the plugin and will be seen
+# when help command is executed.
+Plugin_Logo: ""
+
+# +--------------- Sync Configuration -----------------+
+
+# This is your broadcast channels.
+# When someone joins your Discord or
+# someone synchronize their account
+# the bot will send the message here.
+SyncChannels:
+- '123456789'
+- '987654321'
+
+# +------------- Support Configuration ----------------+
+
 # This is your support voice channels.
 # If someone joins these channels, it will
 # send a message to ops in-game.
@@ -43,13 +59,7 @@ VoiceChannels:
   - '123123123'
   - '123123123'
 
-# This is your broadcast channels.
-# When someone joins your Discord or
-# someone synchronize their account
-# the bot will send the message here.
-SyncChannels:
-  - '123456789'
-  - '987654321'
+# +------------ litebans Configuration ----------------+
 
 # When someone gets banned in-game,
 # send a broadcast to these channels.
@@ -57,6 +67,18 @@ BanChannels:
   - '12121212'
   - '123123123'
 
-# This will be the logo of the plugin and will be seen when help command
-# is executed.
-Plugin_Logo: ""
+# +------------ Reward Configuration ----------------+
+
+# Minimum amount member in the voice channel for
+# the reward to be distributed.
+MinCount: 5
+
+# How long should the period be for the reward in
+# seconds.
+Period: 3600
+
+# Voice Channels where the rewards will be
+# distributed.
+# Best if channel is kept to 1
+RewardChannels:
+  - '123123132'

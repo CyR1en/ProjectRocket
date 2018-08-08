@@ -8,6 +8,8 @@ responselevel:
 support:
   join: 'The user %s joined the support channel %s!'
   leave: 'The user %s left the support channel %s!'
+raffle:
+  win: '%s won a raffle prize by tuning in to %s voice channel in discord!'
 session:
   start: 'Sync session started! %s'
   approved: 'Sync session approved! %s'

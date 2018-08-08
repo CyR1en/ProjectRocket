@@ -13,6 +13,7 @@ import com.rocket.rocketbot.listeners.LBBroadcast;
 import com.rocket.rocketbot.listeners.PPConnect;
 import com.rocket.rocketbot.listeners.SynchronizeListener;
 import com.rocket.rocketbot.localization.Locale;
+import com.rocket.rocketbot.tasks.RewardTask;
 import com.rocket.rocketbot.utils.Finder;
 import lombok.Getter;
 import net.dv8tion.jda.core.entities.Channel;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class RocketBot extends Plugin {
@@ -35,12 +37,18 @@ public class RocketBot extends Plugin {
     private static RocketBot instance;
     private static Locale locale;
 
-    @Getter Bot bot;
-    @Getter EventWaiter eventWaiter;
-    @Getter private AuthManager authManager;
-    @Getter private SConfig config;
-    @Getter ScheduledExecutorService scheduler;
-    @Getter Broadcaster broadcaster;
+    @Getter
+    Bot bot;
+    @Getter
+    EventWaiter eventWaiter;
+    @Getter
+    private AuthManager authManager;
+    @Getter
+    private SConfig config;
+    @Getter
+    ScheduledExecutorService scheduler;
+    @Getter
+    Broadcaster broadcaster;
 
     @Override
     public void onEnable() {
@@ -57,6 +65,7 @@ public class RocketBot extends Plugin {
         registerCommands();
         registerListener();
         registerChannel();
+        registerTasks();
     }
 
     @Override
@@ -81,6 +90,11 @@ public class RocketBot extends Plugin {
         getProxy().registerChannel("Return");
     }
 
+    private void registerTasks() {
+        long qP = getConfig().getPeriod();
+        getScheduler().scheduleAtFixedRate(new RewardTask(this), qP, qP, TimeUnit.SECONDS);
+    }
+
     public void reload() {
         getConfig().reload();
         broadcaster.loadChannels();
@@ -88,22 +102,22 @@ public class RocketBot extends Plugin {
 
     public List<TextChannel> findValidTextChannels(List<String> tcID) {
         List<Channel> generic = Finder.findValidChannels(TextChannel.class, tcID);
-        return generic.stream().filter(Objects::nonNull).map(e -> (TextChannel) e).collect(Collectors.toList()) ;
+        return generic.stream().filter(Objects::nonNull).map(e -> (TextChannel) e).collect(Collectors.toList());
     }
 
     public List<VoiceChannel> findValidVoiceChannel(List<String> vcID) {
         List<Channel> generic = Finder.findValidChannels(VoiceChannel.class, vcID);
-        return generic.stream().filter(Objects::nonNull).map(e -> (VoiceChannel) e).collect(Collectors.toList()) ;
+        return generic.stream().filter(Objects::nonNull).map(e -> (VoiceChannel) e).collect(Collectors.toList());
     }
 
     public static Locale getLocale() {
-        if(locale == null)
+        if (locale == null)
             return new Locale(getInstance());
         return locale;
     }
 
     public static RocketBot getInstance() {
-        if(instance == null)
+        if (instance == null)
             return new RocketBot();
         return instance;
     }

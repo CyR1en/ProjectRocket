@@ -10,6 +10,7 @@ import com.rocket.rocketclient.configuration.files.ClientConfig;
 import com.rocket.rocketclient.entity.GQuery;
 import com.rocket.rocketclient.entity.IGQuery;
 import com.rocket.rocketclient.entity.RCommand;
+import com.rocket.rocketclient.entity.RRCommand;
 import com.rocket.rocketclient.listeners.BanListener;
 import com.rocket.rocketclient.listeners.PluginChannelListener;
 import com.rocket.rocketclient.listeners.UserConnect;
@@ -65,6 +66,7 @@ public class RocketClient extends JavaPlugin implements Initializable {
         pcl.addPCM(GQuery.class);
         pcl.addPCM(RCommand.class);
         pcl.addPCM(IGQuery.class);
+        pcl.addPCM(RRCommand.class);
         getServer().getMessenger().registerIncomingPluginChannel(this, "Return", pcl);
         Logger.info(" - Now listening for Plugin Messages from BungeeCord");
     }
@@ -74,7 +76,6 @@ public class RocketClient extends JavaPlugin implements Initializable {
         getServer().getPluginManager().registerEvents(new UserConnect(this), this);
         Events.get().register(new BanListener(this));
     }
-
 
     public void sendToBungeeCord(PluginMessageRecipient r, String channel, String main, String... other) {
         ByteArrayOutputStream b = new ByteArrayOutputStream();

@@ -27,6 +27,7 @@ public class Broadcaster {
     public Broadcaster(RocketBot rocketBot) {
         this.rocketBot = rocketBot;
         registeredSyncChannels = new ArrayList<>();
+        registeredBanChannels = new ArrayList<>();
         loadChannels();
     }
 
@@ -98,7 +99,7 @@ public class Broadcaster {
     }
 
     public void loadChannels() {
-        List<List<String>> channels = Arrays.asList(rocketBot.getConfig().getTextChannels(), rocketBot.getConfig().getTextChannels());
+        List<List<String>> channels = Arrays.asList(rocketBot.getConfig().getTextChannels(), rocketBot.getConfig().getBanChannels());
         channels.forEach(list -> rocketBot.findValidTextChannels(list).forEach(tc -> {
             registeredSyncChannels.add(tc);
             rocketBot.getLogger().info(String.format("- registered %s", tc.toString()));
