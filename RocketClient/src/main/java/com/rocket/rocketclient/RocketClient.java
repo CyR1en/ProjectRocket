@@ -11,10 +11,8 @@ import com.rocket.rocketclient.entity.GQuery;
 import com.rocket.rocketclient.entity.IGQuery;
 import com.rocket.rocketclient.entity.RCommand;
 import com.rocket.rocketclient.entity.RRCommand;
-import com.rocket.rocketclient.listeners.BanListener;
 import com.rocket.rocketclient.listeners.PluginChannelListener;
 import com.rocket.rocketclient.listeners.UserConnect;
-import litebans.api.Events;
 import lombok.Getter;
 import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
@@ -43,6 +41,17 @@ public class RocketClient extends JavaPlugin implements Initializable {
     @Override
     public void onEnable() {
         Bukkit.getScheduler().runTaskLater(this, () -> Initializer.initAll(this), 1L);
+        try {
+            litebans.api.Events.get().register(new litebans.api.Events.Listener(){
+                @Override
+                public void broadcastSent(String message, String type) {
+                    if(type != null && type.equals("broadcast"))
+                        sendToBungeeCord(getServer(), "LBBroadcast", message);
+                }
+            });
+        } catch (Throwable e) {
+            getLogger().warning("LiteBans was not found! Discord broadcast is now disabled.");
+        }
     }
 
     @Override
@@ -74,7 +83,6 @@ public class RocketClient extends JavaPlugin implements Initializable {
     @Initialize(priority = 2)
     public void initListeners() {
         getServer().getPluginManager().registerEvents(new UserConnect(this), this);
-        Events.get().register(new BanListener(this));
     }
 
     public void sendToBungeeCord(PluginMessageRecipient r, String channel, String main, String... other) {
