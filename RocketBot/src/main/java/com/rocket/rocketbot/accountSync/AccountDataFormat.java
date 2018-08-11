@@ -17,7 +17,7 @@ public class AccountDataFormat {
         discordUsername = mcUser.getDUser() == null ? "Not Synced yet" : mcUser.getDUser().getName();
         mcGroupName = mcUser.getDUser() == null ? "Not Synced yet" :
                 Database.getJSONObject(mcUser.getProxiedPlayer().getName()).getString(DataKey.MC_GROUP.toString());
-        rewarded = mcUser.getDUser() != null;
+        rewarded = mcUser.getDUser() != null && (Database.getJSONObject(mcUser.getProxiedPlayer().getName()).getBoolean(DataKey.REWARDED.toString()));
     }
 
     public AccountDataFormat(JSONObject accData) {

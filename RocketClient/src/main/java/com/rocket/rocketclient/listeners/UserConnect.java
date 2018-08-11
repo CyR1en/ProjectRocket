@@ -18,7 +18,7 @@ public class UserConnect implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Bukkit.getScheduler().runTaskLater(client, () -> {
-            String g = client.getGroup(event.getPlayer().getUniqueId().toString());
+            String g = client.getGroup(event.getPlayer().getName());
             client.sendToBungeeCord(event.getPlayer(), "RJGQuery", g, event.getPlayer().getUniqueId().toString());
         }, 40L);
     }

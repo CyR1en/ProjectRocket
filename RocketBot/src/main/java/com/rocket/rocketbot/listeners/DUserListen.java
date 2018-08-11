@@ -5,6 +5,8 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.core.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.util.List;
@@ -30,7 +32,23 @@ public class DUserListen extends ListenerAdapter {
     }
 
     @Override
+    public void onGuildVoiceMove(GuildVoiceMoveEvent event) {
+        if(voiceChannels.contains(event.getChannelJoined())) {
+            Member m = event.getMember();
+            VoiceChannel vc = event.getChannelJoined();
+            String message = RocketBot.getLocale().getTranslatedMessage("support.join").f(m.getEffectiveName(), vc.getName());
+            rocketBot.getBroadcaster().sendBroadcastToStaff(message);
+        } else {
+            handleMoveLeave(event);
+        }
+    }
+
+    @Override
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
+        handleMoveLeave(event);
+    }
+
+    private void handleMoveLeave(GuildVoiceUpdateEvent event) {
         if(voiceChannels.contains(event.getChannelLeft())) {
             Member m = event.getMember();
             VoiceChannel vc = event.getChannelLeft();

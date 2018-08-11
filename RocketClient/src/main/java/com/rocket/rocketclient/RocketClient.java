@@ -30,7 +30,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.UUID;
 
 public class RocketClient extends JavaPlugin implements Initializable {
 
@@ -40,6 +39,7 @@ public class RocketClient extends JavaPlugin implements Initializable {
 
     @Override
     public void onEnable() {
+        Logger.init("RocketClient");
         Bukkit.getScheduler().runTaskLater(this, () -> Initializer.initAll(this), 1L);
     }
 
@@ -100,14 +100,12 @@ public class RocketClient extends JavaPlugin implements Initializable {
         r.sendPluginMessage(RocketClient.getPlugin(RocketClient.class), "BungeeCord", b.toByteArray());
     }
 
-    public String getGroup(String uuid) {
+    public String getGroup(String name) {
         RegisteredServiceProvider<LuckPermsApi> provider = Bukkit.getServicesManager().getRegistration(LuckPermsApi.class);
         if (provider != null) {
             LuckPermsApi api = provider.getProvider();
-            System.out.println("sUUD = " + uuid);
-            UUID uid = UUID.fromString(uuid);
-            Player p = Bukkit.getServer().getPlayer(uid);
-            User user = api.getUser(p.getUniqueId());
+            Player p = Bukkit.getServer().getPlayer(name);
+            User user = api.getUser(p.getName());
             if (user != null) {
                 Group group = api.getGroupManager().getGroup(user.getPrimaryGroup());
                 Optional<String> displayName = Optional.empty();

@@ -36,7 +36,7 @@ public class Synchronize extends BCommand {
             commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[RocketBot] &c" + message));
             return;
         }
-        String s = SimplifiedDatabase.get(pp.getUniqueId().toString());
+        String s = SimplifiedDatabase.get(pp.getName());
         User dUser;
         if (s != null && !s.equals("Not Synced yet")) {
             dUser = getRocketBot().getBot().getJda().getUserById(SimplifiedDatabase.get(pp.getName()));

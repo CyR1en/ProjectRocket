@@ -2,3 +2,5 @@ name: RocketClient
 main: com.rocket.rocketclient.RocketClient
 version: 1.0
 author: CyR1en
+
+depend: [LiteBans]

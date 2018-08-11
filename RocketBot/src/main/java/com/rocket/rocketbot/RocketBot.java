@@ -9,11 +9,9 @@ import com.rocket.rocketbot.commands.minecraftCommands.Synchronize;
 import com.rocket.rocketbot.configuration.SConfig;
 import com.rocket.rocketbot.entity.Broadcaster;
 import com.rocket.rocketbot.listeners.DeSyncListener;
-import com.rocket.rocketbot.listeners.LBBroadcast;
 import com.rocket.rocketbot.listeners.PPConnect;
 import com.rocket.rocketbot.listeners.SynchronizeListener;
 import com.rocket.rocketbot.localization.Locale;
-import com.rocket.rocketbot.tasks.RewardTask;
 import com.rocket.rocketbot.utils.Finder;
 import lombok.Getter;
 import net.dv8tion.jda.core.entities.Channel;
@@ -29,7 +27,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class RocketBot extends Plugin {
@@ -65,7 +62,6 @@ public class RocketBot extends Plugin {
         registerCommands();
         registerListener();
         registerChannel();
-        registerTasks();
     }
 
     @Override
@@ -83,17 +79,12 @@ public class RocketBot extends Plugin {
         getProxy().getPluginManager().registerListener(this, new UserConnectionListener(this));
         getProxy().getPluginManager().registerListener(this, new DeSyncListener(this));
         getProxy().getPluginManager().registerListener(this, new PPConnect(this));
-        getProxy().getPluginManager().registerListener(this, new LBBroadcast(this));
     }
 
     private void registerChannel() {
         getProxy().registerChannel("Return");
     }
 
-    private void registerTasks() {
-        long qP = getConfig().getPeriod();
-        getScheduler().scheduleAtFixedRate(new RewardTask(this), qP, qP, TimeUnit.SECONDS);
-    }
 
     public void reload() {
         getConfig().reload();

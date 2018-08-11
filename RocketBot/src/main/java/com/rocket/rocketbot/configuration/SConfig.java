@@ -38,8 +38,8 @@ public class SConfig extends SFile {
         return getConfig().getBoolean("Delete_Response");
     }
 
-    public List<String> getTextChannels() {
-        return getConfig().getStringList("TextChannels");
+    public List<String> getSyncChannels() {
+        return getConfig().getStringList("SyncChannels");
     }
 
     public List<String> getVoiceChannels() {

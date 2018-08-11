@@ -33,6 +33,7 @@ public class DUserLeave extends ListenerAdapter {
             JSONObject data = Database.get(s);
             if(data != null && sid != null && sid.equals(user.getId())) {
                 for (DataKey dataKey : DataKey.values()) {
+                    if(dataKey.equals(DataKey.REWARDED)) continue;
                     data.remove(dataKey.toString());
                     data.put(dataKey.toString(), "Not Synced yet");
                 }

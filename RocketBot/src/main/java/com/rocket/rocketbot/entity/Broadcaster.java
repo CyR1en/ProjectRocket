@@ -1,7 +1,6 @@
 package com.rocket.rocketbot.entity;
 
 import com.rocket.rocketbot.RocketBot;
-import com.rocket.rocketbot.utils.Finder;
 import lombok.Getter;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.*;
@@ -13,7 +12,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.awt.*;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -28,7 +26,6 @@ public class Broadcaster {
         this.rocketBot = rocketBot;
         registeredSyncChannels = new ArrayList<>();
         registeredBanChannels = new ArrayList<>();
-        loadChannels();
     }
 
     public void sendBroadcastToAll(String message, boolean embedded) {
@@ -55,14 +52,7 @@ public class Broadcaster {
     public void sendBroadcastToStaff(String message) {
         List<ProxiedPlayer> staff = ProxyServer.getInstance().getPlayers()
                 .stream().filter(p -> p.hasPermission("rocket.staff")).collect(Collectors.toList());
-        staff.forEach(s -> {
-            sendMessageToPP(s, message);
-            if(Finder.findUserInDatabase(s) != null) {
-                UnifiedUser unifiedUser = new UnifiedUser(s);
-                MessageEmbed mB = Messenger.embedMessage(rocketBot.getBot().getJda(), message, Messenger.ResponseLevel.INFO, OffsetDateTime.now(), Messenger.ResponseLevel.INFO.getColor());
-                sendPrivateMessage(unifiedUser.getDUser().getUser(), mB);
-            }
-        });
+        staff.forEach(s -> sendMessageToPP(s, message));
     }
 
     public void sendBroadcastToAllBackend(String message) {
@@ -93,16 +83,22 @@ public class Broadcaster {
     }
 
     public void sendBanMessage(String message) {
+        message = ChatColor.stripColor(message);
         MessageEmbed mb = Messenger.embedMessage(
                 rocketBot.getBot().getJda(), message, Messenger.ResponseLevel.LB_BROADCAST, OffsetDateTime.now(), null);
         getRegisteredBanChannels().forEach(c -> c.sendMessage(mb).queue());
     }
 
     public void loadChannels() {
-        List<List<String>> channels = Arrays.asList(rocketBot.getConfig().getTextChannels(), rocketBot.getConfig().getBanChannels());
-        channels.forEach(list -> rocketBot.findValidTextChannels(list).forEach(tc -> {
+        registeredSyncChannels.clear();
+        registeredBanChannels.clear();
+        rocketBot.findValidTextChannels(rocketBot.getConfig().getSyncChannels()).forEach(tc -> {
             registeredSyncChannels.add(tc);
-            rocketBot.getLogger().info(String.format("- registered %s", tc.toString()));
-        }));
+            rocketBot.getLogger().info(String.format("- Registered SyncChannel: %s", tc.toString()));
+        });
+        rocketBot.findValidTextChannels(rocketBot.getConfig().getBanChannels()).forEach(tc -> {
+            registeredBanChannels.add(tc);
+            rocketBot.getLogger().info(String.format("- Registered BanChannel: %s", tc.toString()));
+        });
     }
 }
