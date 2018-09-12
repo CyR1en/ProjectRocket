@@ -1,7 +1,6 @@
 package com.rocket.rocketbot.accountSync.Authentication;
 
 import com.rocket.rocketbot.RocketBot;
-import com.rocket.rocketbot.accountSync.Database;
 import com.rocket.rocketbot.accountSync.exceptions.IllegalConfirmKeyException;
 import com.rocket.rocketbot.accountSync.exceptions.IllegalConfirmRequesterException;
 import com.rocket.rocketbot.accountSync.exceptions.IllegalConfirmSessionIDException;
@@ -14,7 +13,6 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.json.JSONObject;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -92,7 +90,7 @@ public class AuthSession {
             UnifiedUser mcUser = new UnifiedUser(sender);
             DUser du = new DUser(rocketBot.getAuthManager().getSession(this.authToken.toString()).getDiscordAcc());
             mcUser.setDUser(du);
-            Database.set(mcUser.getProxiedPlayer().getName(), new JSONObject(mcUser.getDataAsMap()));
+            rocketBot.getDb().sync(mcUser.getProxiedPlayer().getName(), du.getID(), du.getName());
             rocketBot.getAuthManager().removeSession(this.getAuthToken().toString());
             scheduler.shutdownNow();
             ProxyServer.getInstance().getPluginManager().callEvent(new SynchronizeEvent(sender, mcUser));

@@ -3,7 +3,6 @@ package com.rocket.rocketbot.utils;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import com.rocket.rocketbot.Bot;
 import com.rocket.rocketbot.RocketBot;
-import com.rocket.rocketbot.accountSync.SimplifiedDatabase;
 import net.dv8tion.jda.core.entities.Channel;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -12,6 +11,8 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,14 +36,6 @@ public class Finder {
         return null;
     }
 
-    public static ProxiedPlayer findPlayerInDatabase(String discordID) {
-        if(discordID == null) return null;
-        String username = SimplifiedDatabase.getInvertedData().get(discordID);
-        if(username == null) return null;
-        else if(!username.equals("Not Synced yet")) {
-            return ProxyServer.getInstance().getPlayer(username);
-        } else return null;
-    }
 
     public static List<Channel> findValidChannels(Class<? extends Channel> tClass, List<String> cID) {
         boolean isText = tClass.getSimpleName().equals("TextChannel");
@@ -54,14 +47,14 @@ public class Finder {
                     Channel c = isText ? bot.getJda().getTextChannelById(s) : bot.getJda().getVoiceChannelById(s);
                     if (c != null) {
                         out.add(c);
-                        RocketBot.getInstance().getLogger().info("- Loaded " + c);
+                        RocketBot.getInstance().getLogger().info("- Validated " + c);
                     }
                 } else {
                     List<Guild> guilds = bot.getJda().getGuilds();
                     guilds.forEach(g -> (isText ? g.getTextChannels() : g.getVoiceChannels()).forEach((c) -> {
                         if (c.getName().equals(s)) {
                             out.add(c);
-                            RocketBot.getInstance().getLogger().info("- Loaded " + c);
+                            RocketBot.getInstance().getLogger().info("- Validated " + c);
                         }
                     }));
                 }
@@ -70,13 +63,36 @@ public class Finder {
         return out;
     }
 
+    public static ProxiedPlayer findPlayerInDatabase(String discordID) {
+        try {
+            if (discordID == null) return null;
+            ResultSet resultSet = RocketBot.getInstance().getDb().getRowByDID(discordID);
+            if (resultSet.next()) {
+                String name = resultSet.getString("name");
+                if (!name.equals("Not Synced Yet"))
+                    return ProxyServer.getInstance().getPlayer(name);
+                else return null;
+            } else return null;
+        } catch (SQLException e) {
+            RocketBot.getInstance().getLogger().severe("An error occurred while finding player in database!");
+            return null;
+        }
+    }
+
     public static User findUserInDatabase(ProxiedPlayer p) {
-        if(p == null) return null;
-        String id = SimplifiedDatabase.get(p.getName());
-        if(id == null) return null;
-        else if(!id.equals("Not Synced yet")) {
-            return RocketBot.getInstance().getBot().getJda().getUserById(id);
-        } else return null;
+        try {
+            if (p == null) return null;
+            ResultSet resultSet = RocketBot.getInstance().getDb().getRowByName(p.getName());
+            if (resultSet.next()) {
+                String id = resultSet.getString("d_id");
+                if (!id.equals("Not Synced Yet") && StringUtils.isNumeric(id))
+                    return RocketBot.getInstance().getBot().getJda().getUserById(id);
+                else return null;
+            } else return null;
+        } catch (SQLException e) {
+            RocketBot.getInstance().getLogger().severe("An error occurred while finding user in database!");
+            return null;
+        }
     }
 
 }

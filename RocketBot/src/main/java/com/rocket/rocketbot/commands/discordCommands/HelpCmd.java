@@ -42,6 +42,8 @@ public class HelpCmd extends DCommand {
             StringBuilder str = new StringBuilder();
             if (getAllCommandsWithCategoryOf(c.getCategory()).size() != 0) {
                 for (Command cmd : getAllCommandsWithCategoryOf(c.getCategory())) {
+                    if(cmd instanceof DCommand)
+                        if(cmd.isHidden()) continue;
                     str.append(getRocketBot().getBot().getClient().getPrefix()).append(cmd.getName())
                             .append(cmd.getArguments() == null ? "" : " " + cmd.getArguments())
                             .append(" - ").append(cmd.getHelp()).append("\n");

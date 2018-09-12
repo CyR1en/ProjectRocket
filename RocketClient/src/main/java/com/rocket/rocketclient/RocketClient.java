@@ -12,7 +12,7 @@ import com.rocket.rocketclient.entity.IGQuery;
 import com.rocket.rocketclient.entity.RCommand;
 import com.rocket.rocketclient.entity.RRCommand;
 import com.rocket.rocketclient.listeners.PluginChannelListener;
-import com.rocket.rocketclient.listeners.UserConnect;
+import com.rocket.rocketclient.listeners.UserJoin;
 import lombok.Getter;
 import me.lucko.luckperms.api.Group;
 import me.lucko.luckperms.api.LuckPermsApi;
@@ -29,13 +29,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 public class RocketClient extends JavaPlugin implements Initializable {
 
     @Getter private static RocketClient instance;
 
     @Getter private RConfigManager rConfigManager;
+    @Getter private LuckPermsApi lpAPI;
 
     @Override
     public void onEnable() {
@@ -70,14 +73,29 @@ public class RocketClient extends JavaPlugin implements Initializable {
     }
 
     @Initialize(priority = 2)
+    public void initHooks() {
+        RegisteredServiceProvider<LuckPermsApi> provider = Bukkit.getServicesManager().getRegistration(LuckPermsApi.class);
+        if(provider != null)
+            lpAPI = provider.getProvider();
+    }
+
+    @Initialize(priority = 3)
     public void initListeners() {
-        getServer().getPluginManager().registerEvents(new UserConnect(this), this);
+        getServer().getPluginManager().registerEvents(new UserJoin(this), this);
         try {
             litebans.api.Events.get().register(new litebans.api.Events.Listener(){
+
                 @Override
                 public void broadcastSent(String message, String type) {
-                    if(type != null && type.equals("broadcast"))
-                        sendToBungeeCord(getServer(), "LBBroadcast", message);
+                    if(type != null && type.equals("broadcast")) {
+                        List<Player> lp = new ArrayList<>(getServer().getOnlinePlayers());
+                        if (lp.size() <= 0)
+                            return;
+                        Player randTarget = lp.get(new Random().nextInt(lp.size()));
+                        sendToBungeeCord(randTarget, "LBBroadcast", message);
+                        System.out.println("Sent a litebands broadcast command!");
+                        System.out.println("Random PLM target " + randTarget.getName());
+                    }
                 }
             });
         } catch (Throwable e) {
@@ -101,13 +119,11 @@ public class RocketClient extends JavaPlugin implements Initializable {
     }
 
     public String getGroup(String name) {
-        RegisteredServiceProvider<LuckPermsApi> provider = Bukkit.getServicesManager().getRegistration(LuckPermsApi.class);
-        if (provider != null) {
-            LuckPermsApi api = provider.getProvider();
+        if (lpAPI != null) {
             Player p = Bukkit.getServer().getPlayer(name);
-            User user = api.getUser(p.getName());
+            User user = lpAPI.getUser(p.getName());
             if (user != null) {
-                Group group = api.getGroupManager().getGroup(user.getPrimaryGroup());
+                Group group = lpAPI.getGroupManager().getGroup(user.getPrimaryGroup());
                 Optional<String> displayName = Optional.empty();
                 try {
                     for (Node n : group == null ? new ArrayList<Node>() : group.getOwnNodes()) {
@@ -127,4 +143,5 @@ public class RocketClient extends JavaPlugin implements Initializable {
         }
         return null;
     }
+
 }

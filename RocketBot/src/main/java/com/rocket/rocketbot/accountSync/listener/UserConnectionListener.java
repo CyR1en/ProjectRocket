@@ -1,16 +1,13 @@
 package com.rocket.rocketbot.accountSync.listener;
 
 import com.rocket.rocketbot.RocketBot;
-import com.rocket.rocketbot.accountSync.DataKey;
-import com.rocket.rocketbot.accountSync.Database;
-import com.rocket.rocketbot.entity.UnifiedUser;
 import com.rocket.rocketbot.listeners.SListener;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.event.EventHandler;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.util.logging.Level;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 
 public class UserConnectionListener extends SListener {
@@ -21,24 +18,14 @@ public class UserConnectionListener extends SListener {
 
     @EventHandler
     public void onJoin(PostLoginEvent event) {
-        JSONObject data = Database.get(event.getPlayer().getName());
-        UnifiedUser unifiedUser = new UnifiedUser(event.getPlayer());
-        if (data == null) {
-            Database.set(unifiedUser.getProxiedPlayer().getName(), new JSONObject(unifiedUser.getDataAsMap()));
-        } else {
-            if (!checkDataNodes(unifiedUser, data))
-                getRocketBot().getLogger().log(Level.WARNING, "There was an issue with " + event.getPlayer().getName() + "'s account sync data and have been re-initiated.");
-        }
-    }
-
-    private boolean checkDataNodes(UnifiedUser unifiedUser, JSONObject data) {
-        for (DataKey dataKey : DataKey.values())
-            try {
-                data.get(dataKey.toString());
-            } catch (JSONException ex) {
-                Database.set(unifiedUser.getProxiedPlayer().getName(), new JSONObject(unifiedUser.getDataAsMap()));
-                return false;
+        ProxyServer.getInstance().getScheduler().runAsync(getRocketBot(), () -> {
+            try{
+                ResultSet row = getRocketBot().getDb().getRowByName(event.getPlayer().getName());
+                if (!row.next())
+                    getRocketBot().getDb().insertNew(event.getPlayer().getName());
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        return true;
+        });
     }
 }

@@ -32,6 +32,7 @@ public abstract class DCommand extends Command implements Comparable<Command> {
     protected SConfig config;
 
     @Getter protected Type type;
+    @Getter protected boolean hidden;
     @Getter protected RocketBot rocketBot;
 
     public DCommand(RocketBot rocketBot) {
@@ -41,6 +42,7 @@ public abstract class DCommand extends Command implements Comparable<Command> {
         this.botPermissions = setupPerms();
         config = rocketBot.getConfig();
         type = Type.DEFAULT;
+        hidden = false;
         auto = config.isAutoDelete();
         scheduler = rocketBot.getScheduler();
     }

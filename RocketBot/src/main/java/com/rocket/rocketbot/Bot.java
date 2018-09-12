@@ -6,13 +6,7 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.rocket.rocketbot.accountSync.DataKey;
-import com.rocket.rocketbot.accountSync.Database;
-import com.rocket.rocketbot.accountSync.SimplifiedDatabase;
-import com.rocket.rocketbot.commands.discordCommands.DeSyncCmd;
-import com.rocket.rocketbot.commands.discordCommands.HelpCmd;
-import com.rocket.rocketbot.commands.discordCommands.PingCmd;
-import com.rocket.rocketbot.commands.discordCommands.ReloadCmd;
+import com.rocket.rocketbot.commands.discordCommands.*;
 import com.rocket.rocketbot.entity.Messenger;
 import com.rocket.rocketbot.listeners.BotReady;
 import com.rocket.rocketbot.listeners.DUserJoin;
@@ -26,9 +20,10 @@ import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.managers.GuildController;
 import net.dv8tion.jda.core.utils.PermissionUtil;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.json.JSONObject;
 
 import javax.security.auth.login.LoginException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
@@ -107,7 +102,8 @@ public class Bot {
                 new HelpCmd(rocketBot),
                 new PingCmd(rocketBot),
                 new ReloadCmd(rocketBot),
-                new DeSyncCmd(rocketBot)
+                new DeSyncCmd(rocketBot),
+                new TransferData(rocketBot)
         );
         client = cb.build();
         jda.addEventListener(client);
@@ -119,55 +115,61 @@ public class Bot {
     }
 
     public void removeRole(String role, ProxiedPlayer pp) {
-        List<Guild> guilds = getJda().getGuilds();
-        for (Guild guild : guilds) {
-            String id = SimplifiedDatabase.get(pp.getName());
-            Member m = guild.getMemberById(id);
-            GuildController gc = guild.getController();
-            if(m != null) {
-                guild.getRolesByName(role, true).forEach(r -> m.getRoles().forEach(rr -> {
-                    if(rr.getName().equalsIgnoreCase(role))
-                        gc.removeSingleRoleFromMember(m, rr).queue();
-                }));
+        try {
+            List<Guild> guilds = getJda().getGuilds();
+            for (Guild guild : guilds) {
+                ResultSet row = rocketBot.getDb().getRowByName(pp.getName());
+                row.next();
+                String id = row.getString("d_id");
+                Member m = guild.getMemberById(id);
+                GuildController gc = guild.getController();
+                if (m != null) {
+                    guild.getRolesByName(role, true).forEach(r -> m.getRoles().forEach(rr -> {
+                        if (rr.getName().equalsIgnoreCase(role))
+                            gc.removeSingleRoleFromMember(m, rr).queue();
+                    }));
+                }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
     public void handleRole(String group, ProxiedPlayer p) {
         if (group == null)
             return;
-        List<Guild> guilds = getJda().getGuilds();
-        for (Guild g : guilds) {
-            String id = SimplifiedDatabase.get(p.getName());
-            Member m = g.getMemberById(id);
-            if (m == null)
-                continue;
-            GuildController controller = g.getController();
-            if (PermissionUtil.canInteract(g.getMember(g.getJDA().getSelfUser()), m)) {
-                if (roleExists(g, group))
-                    g.getRolesByName(group, true).forEach(r -> {
-                        controller.addSingleRoleToMember(m, r).queue();
-                        setDB(p, r);
-                    });
-                else {
-                    controller.createRole().setName(group).setHoisted(true).queue(r -> {
-                        controller.addSingleRoleToMember(m, r).queue();
-                        setDB(p, r);
-                    });
+        try {
+            List<Guild> guilds = getJda().getGuilds();
+            ResultSet row = rocketBot.getDb().getRowByName(p.getName());
+            if (row.next()) {
+                String id = row.getString("d_id");
+                for (Guild g : guilds) {
+                    Member m = g.getMemberById(id);
+                    if (m == null)
+                        continue;
+                    GuildController controller = g.getController();
+                    if (PermissionUtil.canInteract(g.getMember(g.getJDA().getSelfUser()), m)) {
+                        if (roleExists(g, group))
+                            g.getRolesByName(group, true).forEach(r -> {
+                                controller.addSingleRoleToMember(m, r).queue();
+                                rocketBot.getDb().updateGroup(p.getName(), r.getName());
+                            });
+                        else {
+                            controller.createRole().setName(group).setHoisted(true).queue(r -> {
+                                controller.addSingleRoleToMember(m, r).queue();
+                                rocketBot.getDb().updateGroup(p.getName(), r.getName());
+                            });
+                        }
+                        controller.setNickname(m, p.getName()).queue();
+                    } else {
+                        String message = String.format("The bot cannot modify the role or nickname for %s because %s has a higher or equal role in %s!", m.getEffectiveName(), m.getEffectiveName(), g);
+                        rocketBot.getLogger().warning(message);
+                    }
                 }
-                controller.setNickname(m, p.getName()).queue();
-            } else {
-                String message = String.format("The bot cannot modify the role or nickname for %s because %s has a higher or equal role in %s!", m.getEffectiveName(), m.getEffectiveName(), g);
-                rocketBot.getLogger().warning(message);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    }
-
-    private void setDB(ProxiedPlayer p, Role r) {
-        JSONObject data = Database.getJSONObject(p.getName());
-        data.remove(DataKey.MC_GROUP.toString());
-        data.put(DataKey.MC_GROUP.toString(), r.getName());
-        Database.set(p.getName(), data);
     }
 
     private boolean roleExists(Guild g, String role) {

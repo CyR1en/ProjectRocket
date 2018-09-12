@@ -5,11 +5,16 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+
 public class RCommand implements PCM {
 
     private RocketClient rocketClient;
 
-    @Getter private String name;
+    @Getter
+    private String name;
 
     public RCommand(RocketClient rocketClient) {
         this.rocketClient = rocketClient;
@@ -18,10 +23,17 @@ public class RCommand implements PCM {
 
     @Override
     public void handle(String s, Player player, byte[] bytes) {
-        String command = rocketClient.getRConfigManager().getGeneralConfig().getCommand();
-        command = command.replace("{player}", player.getName());
-        command = command.replaceAll("/", "").trim();
-        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+        try {
+            DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes));
+            in.readUTF(); //skip the first data
+            String name = in.readUTF();
+            String command = rocketClient.getRConfigManager().getGeneralConfig().getCommand();
+            command = command.replace("{player}", name);
+            command = command.replaceAll("/", "").trim();
+            Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

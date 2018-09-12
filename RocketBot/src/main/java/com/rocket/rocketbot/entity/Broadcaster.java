@@ -34,13 +34,14 @@ public class Broadcaster {
     }
 
     public void sendBroadcastToDiscord(String message, boolean embedded) {
+        final String msg = ChatColor.stripColor(message);
         registeredSyncChannels.forEach(tc -> {
             if(embedded) {
                 OffsetDateTime odt = OffsetDateTime.now();
                 User selfUser = RocketBot.getInstance().getBot().getJda().getSelfUser();
                 Color c = tc.getGuild().getMember(selfUser).getColor();
                 MessageEmbed me = Messenger.embedMessage(rocketBot.getBot().getJda(),
-                        message, Messenger.ResponseLevel.BROADCAST, odt, c);
+                        msg, Messenger.ResponseLevel.BROADCAST, odt, c);
                 tc.sendMessage(me).queue();
             } else {
                 Message m = new MessageBuilder().append(message).build();

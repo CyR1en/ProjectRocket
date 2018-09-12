@@ -44,9 +44,16 @@ public class RewardTask implements Runnable {
         if(participants.size() >= min) {
             ProxiedPlayer winner = ListUtil.chooseRandom(participants);
             ServerInfo server = winner.getServer().getInfo();
-            rocketBot.sendToBukkit("RRCommand", "", server);
+            rocketBot.sendToBukkit("RRCommand", winner.getName(), server);
             List<String> cName = rewardChannel.stream().map(Channel::getName).collect(Collectors.toList());
-            String rCs = StringUtils.join(cName, ",").replaceAll("\\s([^,]+)$", " and $1");
+            String rCs;
+            String conj = rocketBot.getConfig().getConjunction();
+            if(cName.size() == 1)
+                rCs = cName.get(0);
+            else if(cName.size() == 2)
+                rCs = StringUtils.join(cName, conj);
+            else
+                rCs = StringUtils.join(cName, ",").replaceAll("\\s([^,]+)$", " " + conj + " $1");
             String message = RocketBot.getLocale().getTranslatedMessage("raffle.win").f(winner, rCs);
             rocketBot.getBroadcaster().sendBroadcastToAll(message, true);
         } else {

@@ -62,4 +62,27 @@ public class SConfig extends SFile {
         return getConfig().getInt("MinCount");
     }
 
+    public String getConjunction() {
+        return getConfig().getString("Conjunction");
+    }
+
+    public String getSQLHost() {
+        return getConfig().getString("host");
+    }
+
+    public int getSQLPort() {
+        return getConfig().getInt("port");
+    }
+
+    public String getSQLDatabase() {
+        return getConfig().getString("database");
+    }
+
+    public String getSQLUName() {
+        return getConfig().getString("username");
+    }
+
+    public String getSQLPass() {
+        return getConfig().getString("password");
+    }
 }

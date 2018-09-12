@@ -1,6 +1,6 @@
 name: RocketClient
 main: com.rocket.rocketclient.RocketClient
-version: 1.0
+version: 1.4_b1
 author: CyR1en
 
-depend: [LiteBans]
+depend: [LiteBans, LuckPerms]

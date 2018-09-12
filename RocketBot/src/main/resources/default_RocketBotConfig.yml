@@ -1,4 +1,17 @@
 # +----------------------------------------------------+
+# <               Database Configuration               >
+# <                                                    >
+# <                All db configuration                >
+# +----------------------------------------------------+
+
+# SQL Database credentials
+host: 'localhost'
+port: 3306
+database: 'minecraft_rc'
+username: 'cyr1en'
+password: '123'
+
+# +----------------------------------------------------+
 # <                 Bot Configuration                  >
 # <                                                    >
 # <               All bot configuration                >
@@ -82,3 +95,6 @@ Period: 3600
 # Best if channel is kept to 1
 RewardChannels:
   - '123123132'
+
+# Conjunction word that will be used in a list
+Conjunction: "e"

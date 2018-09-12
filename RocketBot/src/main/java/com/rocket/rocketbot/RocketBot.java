@@ -2,7 +2,7 @@ package com.rocket.rocketbot;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.rocket.rocketbot.accountSync.Authentication.AuthManager;
-import com.rocket.rocketbot.accountSync.Database;
+import com.rocket.rocketbot.accountSync.DbSQL;
 import com.rocket.rocketbot.accountSync.listener.UserConnectionListener;
 import com.rocket.rocketbot.commands.minecraftCommands.SyncConfirm;
 import com.rocket.rocketbot.commands.minecraftCommands.Synchronize;
@@ -46,6 +46,8 @@ public class RocketBot extends Plugin {
     ScheduledExecutorService scheduler;
     @Getter
     Broadcaster broadcaster;
+    @Getter
+    DbSQL db;
 
     @Override
     public void onEnable() {
@@ -57,8 +59,7 @@ public class RocketBot extends Plugin {
         authManager = new AuthManager();
         instance = this;
         broadcaster = new Broadcaster(this);
-        Database.load();
-
+        db = new DbSQL(this, config.getSQLHost(), config.getSQLPort(), config.getSQLDatabase(), config.getSQLUName(), config.getSQLPass());
         registerCommands();
         registerListener();
         registerChannel();
@@ -66,7 +67,9 @@ public class RocketBot extends Plugin {
 
     @Override
     public void onDisable() {
-        bot.shutdown();
+        if (bot.getJda() != null)
+            bot.shutdown();
+        getDb().closeConnection();
     }
 
     private void registerCommands() {
